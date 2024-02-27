@@ -1,0 +1,52 @@
+.span {
+  opacity: 0.4;
+}
+
+.container {
+  max-width: 400px;
+  height: auto;
+  margin: 20px;
+  font-size: 1.7rem;
+  font-weight: 500;
+}
+
+.inputHidden {
+  position: absolute;
+  scale: 0;
+}
+
+.correctLetter {
+  color: var(--gray-800);
+  position: relative;
+}
+
+.lastCorrectLetter::before {
+  content: '';
+  width: 2px;
+  height: 26px;
+  background-color: var(--cyan-700);
+  position: absolute;
+  top: 7px;
+  right: -3px;
+  animation: 1s parpadeo infinite;
+}
+
+@keyframes parpadeo {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.2;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.incorrectLetter {
+  color: var(--red-600);
+}
+
+.incorrectLetter > span {
+  opacity: 1;
+}
