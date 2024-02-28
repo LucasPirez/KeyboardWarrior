@@ -1,3 +1,4 @@
+using keyboard_warrior.AppManager;
 using keyboard_warrior.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +15,9 @@ builder.Services.AddCors(options =>
         .AllowAnyHeader()
         .AllowCredentials());
 });
+
+builder.Services.AddSingleton<IRoomsSingleton, RoomsSingleton>();
+builder.Services.AddSingleton<IStateGameSingleton ,StateGameSingleton>();
 
 var app = builder.Build();
 
@@ -39,5 +43,6 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.MapHub<PlayHub>("/Play");
+app.MapHub<RoomHub>("/room");
 
 app.Run();
