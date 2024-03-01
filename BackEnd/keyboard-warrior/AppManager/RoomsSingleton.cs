@@ -7,16 +7,27 @@ namespace keyboard_warrior.AppManager
     public class RoomsSingleton : IRoomsSingleton
     {
         private ConcurrentDictionary<string, Room> rooms = new();
+        private readonly IUsersSingleton _users;
 
-
-        public List<Room> GetRooms()
+        public RoomsSingleton(IUsersSingleton users)
         {
-            return [.. rooms.Values];
+            _users = users;
         }
 
-        public List<Room> CreateRoom()
+        public IEnumerable<RoomDTO> GetRooms()
         {
-            Room room = new Room();
+            return rooms.Values.Select(a => a.GetRoomDTO());
+        }
+
+      
+        public  IEnumerable<RoomDTO>? CreateRoom(string userName,string roomName )
+        {
+            Room room = new Room(roomName);
+
+            var user = _users.GetUser(userName);
+            if (user == null) return null;           
+
+             room.AddUser(user);
 
             rooms.TryAdd(room.Get().Id, room);
             return GetRooms();
@@ -32,7 +43,7 @@ namespace keyboard_warrior.AppManager
             return null;
         }
 
-        public List<Room> RemoveRoom(string roomId)
+        public IEnumerable<RoomDTO> RemoveRoom(string roomId)
         {
             rooms.TryRemove(roomId, out _);
             return GetRooms();

@@ -1,5 +1,6 @@
 ﻿using keyboard_warrior.DTOs;
 using keyboard_warrior.enums;
+using keyboard_warrior.Hubs;
 using keyboard_warrior.Models;
 
 namespace keyboard_warrior.AppManager
@@ -8,13 +9,17 @@ namespace keyboard_warrior.AppManager
     {
         private string Id { get; set; } = Guid.NewGuid().ToString();
 
-        private string Name { get; set; } = string.Empty;
+        private string Name { get; set; }
 
         private List<UserConnection> ListUser = new();
 
-        private RoomState State { get; set; } = RoomState.Waiting;
+        private string State { get; set; } = RoomState.Waiting;
 
 
+        public Room(string name)
+        {
+            Name = name;
+        }
         public List<UserConnection> GetUsers()
         {
             return ListUser;
@@ -38,9 +43,16 @@ namespace keyboard_warrior.AppManager
             }
         }
 
-        public void SetRoomState(RoomState state)
+        public void SetRoomState(string state)
         {
-            State = state;
+            if (state == RoomState.Waiting || state == RoomState.Playing)
+            {
+                State = state;
+            }
+            else
+            {
+                throw new ArgumentException("Valor no válido para RoomState", nameof(state));
+            }
         }
 
         public RoomModel Get()

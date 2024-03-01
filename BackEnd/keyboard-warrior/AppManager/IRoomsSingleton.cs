@@ -5,11 +5,13 @@ namespace keyboard_warrior.AppManager
 {
     public interface IRoomsSingleton
     {
-        List<Room> GetRooms();
+        IEnumerable<RoomDTO> GetRooms();
 
         RoomDTO? GetRoom(string id);
 
-        List<Room> RemoveRoom(string roomId);
+        IEnumerable<RoomDTO>? CreateRoom(string userName, string roomName);
+
+        IEnumerable<RoomDTO> RemoveRoom(string roomId);
 
         bool AddUser(UserConnection user, string roomId);
 
