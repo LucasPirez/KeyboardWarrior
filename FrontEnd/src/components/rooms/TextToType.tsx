@@ -1,5 +1,6 @@
 import { FormEvent, useRef, useState } from 'react';
 import styles from './TextToType.module.css';
+import Timer from '../Timer';
 
 interface Props {
   text?: string;
@@ -37,6 +38,7 @@ export default function TextToType({
 
   return (
     <>
+      <Timer />
       <div className={styles.container}>
         <input
           type="text"
@@ -62,11 +64,13 @@ export default function TextToType({
             <span
               key={textIndex + '' + Math.random()}
               className={classString}>
-              {charText === ' ' ? (
-                <span className={styles.span}>-</span>
-              ) : (
-                charText
-              )}
+              <span
+                className={`${styles.span} ${
+                  currentChar.index === textIndex &&
+                  styles.lastCorrectLetter
+                }`}>
+                {charText}
+              </span>
             </span>
           );
         })}

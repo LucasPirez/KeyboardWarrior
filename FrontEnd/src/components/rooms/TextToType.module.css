@@ -1,7 +1,3 @@
-.span {
-  opacity: 0.4;
-}
-
 .container {
   max-width: 400px;
   height: auto;
@@ -15,32 +11,24 @@
   scale: 0;
 }
 
-.correctLetter {
-  color: var(--gray-800);
-  position: relative;
-}
-
-.lastCorrectLetter::before {
+/* .lastCorrectLetter::before {
   content: '';
-  width: 2px;
-  height: 26px;
+  height: 2px;
+  width: 100%;
   background-color: var(--cyan-700);
   position: absolute;
-  top: 7px;
-  right: -3px;
-  animation: 1s parpadeo infinite;
+  bottom: 3px;
+  right: 0px;
+} */
+
+.span {
+  opacity: 0.95;
 }
 
-@keyframes parpadeo {
-  0% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.2;
-  }
-  100% {
-    opacity: 1;
-  }
+.correctLetter {
+  color: var(--gray-800);
+  opacity: 1;
+  position: relative;
 }
 
 .incorrectLetter {

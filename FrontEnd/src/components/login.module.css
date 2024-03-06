@@ -1,0 +1,26 @@
+.container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  flex-direction: column;
+}
+
+.subContainer {
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0px 0px 10px #aaaaaa90;
+  transition: all 0.25s;
+  cursor: pointer;
+}
+.subContainer:hover {
+  box-shadow: 0px 3px 10px #aaaaaa;
+}
+
+.elements {
+  width: 300px;
+  margin-bottom: 10px;
+  display: block;
+}
