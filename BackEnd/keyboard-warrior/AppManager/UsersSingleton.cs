@@ -45,16 +45,14 @@ namespace keyboard_warrior.AppManager
         }
 
         public UserConnection? GetUser(string username)
-        {
-            Console.WriteLine(username);
-
+        { 
             if (connectedUsers.TryGetValue(username, out UserConnection user))
             {
                 return user;
             }
             else
             {
-                return null; 
+                return null;
             }
         }
     }

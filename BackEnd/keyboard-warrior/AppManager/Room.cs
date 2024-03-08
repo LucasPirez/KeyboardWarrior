@@ -5,7 +5,7 @@ using keyboard_warrior.Models;
 
 namespace keyboard_warrior.AppManager
 {
-    public class Room
+    public class Room 
     {
         private string Id { get; set; } = Guid.NewGuid().ToString();
 
@@ -55,20 +55,6 @@ namespace keyboard_warrior.AppManager
             }
         }
 
-        public RoomModel Get()
-        {
-           
-            RoomModel room = new() 
-                           {
-                            ListUser = ListUser,
-                            Name = Name,
-                            State = State,
-                            Id = Id
-                           };
-
-            return room;
-        }
-
         public RoomDTO GetRoomDTO()
         {
             return new RoomDTO
@@ -76,7 +62,13 @@ namespace keyboard_warrior.AppManager
                 ListUser = ListUser,
                 Name = Name,
                 State = State,
+                Id = Id
             };
+        }
+
+        public int GetUsersCount()
+        {
+            return ListUser.Count;
         }
 
     }

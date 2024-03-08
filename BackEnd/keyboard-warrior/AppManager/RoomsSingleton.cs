@@ -4,23 +4,17 @@ using System.Collections.Concurrent;
 
 namespace keyboard_warrior.AppManager
 {
-    public class RoomsSingleton : IRoomsSingleton
+    public class RoomsSingleton(IUsersSingleton users) : IRoomsSingleton
     {
         private ConcurrentDictionary<string, Room> rooms = new();
-        private readonly IUsersSingleton _users;
-
-        public RoomsSingleton(IUsersSingleton users)
-        {
-            _users = users;
-        }
+        private readonly IUsersSingleton _users = users;
 
         public IEnumerable<RoomDTO> GetRooms()
         {
             return rooms.Values.Select(a => a.GetRoomDTO());
         }
-
       
-        public  IEnumerable<RoomDTO>? CreateRoom(string userName,string roomName )
+        public  RoomDTO? CreateRoom(string userName,string roomName )
         {
             Room room = new Room(roomName);
 
@@ -29,17 +23,28 @@ namespace keyboard_warrior.AppManager
 
              room.AddUser(user);
 
-            rooms.TryAdd(room.Get().Id, room);
-            return GetRooms();
+            if(rooms.TryAdd(room.GetRoomDTO().Id, room))
+            {
+             return new RoomDTO
+            {
+                Id=room.GetRoomDTO().Id,
+                ListUser= room.GetRoomDTO().ListUser,
+                Name=room.GetRoomDTO().Name,
+                State = room.GetRoomDTO().State,
+            };
+            }
+            else
+            {
+                return null;
+            }
         }
 
-        public RoomDTO? GetRoom(string id)
+        public Room? GetRoom(string id)
         {
             if(rooms.TryGetValue(id, out Room? room))
             {
-                return room.GetRoomDTO();
-            };
-
+                return room;
+            }
             return null;
         }
 
@@ -49,29 +54,41 @@ namespace keyboard_warrior.AppManager
             return GetRooms();
         }
 
-        public bool AddUser(UserConnection user, string roomId)
+        public bool AddUser(string  userName, string roomId)
         {
-            if(rooms.TryGetValue(roomId, out Room? currentRoom))
+            var user = _users.GetUser(userName);
+
+            if (user == null) return false;
+
+            if (rooms.TryGetValue(roomId, out Room? currentRoom))
             {
                 currentRoom.AddUser(user);
                 return true;
             }
-            return false;
+                return false;
         }
 
-        public bool RemoveUser(UserConnection user, string roomId)
+        public bool RemoveUser(string userName, string roomId)
         {
+            var user = _users.GetUser(userName);
+
+            if(user == null) return false;
+
             if (rooms.TryGetValue(roomId, out Room? currentRoom))
             {
                 currentRoom.RemoveUser(user);
+                int usersCount = currentRoom.GetUsersCount();
+
+                if (usersCount == 0)
+                {
+                    rooms.TryRemove(roomId, out _);
+                }
+
                 return true;
             }
             return false;
 
         }
-
-       
     }
-
 }
 
