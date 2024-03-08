@@ -5,8 +5,6 @@ namespace keyboard_warrior.Hubs
 {
     public class RoomHub: Hub
     {
-
-
         public async Task GetResponse(string message)
         {
             await Clients.All.SendAsync("get"

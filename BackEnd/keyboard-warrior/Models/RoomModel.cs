@@ -10,6 +10,6 @@ namespace keyboard_warrior.Models
 
         public List<UserConnection> ListUser = new();
 
-        public RoomState State = RoomState.Waiting;
+        public string State = RoomState.Waiting;
     }
 }

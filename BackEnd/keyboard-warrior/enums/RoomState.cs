@@ -1,8 +1,8 @@
 ﻿namespace keyboard_warrior.enums
 {
-    public enum RoomState
+    public class RoomState
     {
-        Waiting,
-        Playing
+       public static readonly string Waiting = "Waiting";
+       public static readonly string Playing = "Playing";
     }
 }

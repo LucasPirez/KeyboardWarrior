@@ -17,7 +17,7 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddSingleton<IRoomsSingleton, RoomsSingleton>();
-builder.Services.AddSingleton<IStateGameSingleton ,StateGameSingleton>();
+builder.Services.AddSingleton<IUsersSingleton, UsersSingleton>();
 
 var app = builder.Build();
 
@@ -42,7 +42,7 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-app.MapHub<PlayHub>("/Play");
+app.MapHub<GameHub>("/Play");
 app.MapHub<RoomHub>("/room");
 
 app.Run();
