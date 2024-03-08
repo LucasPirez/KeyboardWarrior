@@ -1,44 +1,56 @@
 import * as signalR from '@microsoft/signalr';
 import { urlSocket } from '../constants/url-socket';
+import { SocketResponse } from '../type/socket-response.type';
 
 abstract class SignalRManager {
-  protected server: signalR.HubConnection | null = null;
+  private server: signalR.HubConnectionBuilder =
+    new signalR.HubConnectionBuilder();
+  private hub1: signalR.HubConnection | null = null;
+  private hub2: signalR.HubConnection | null = null;
 
-  async connect(path: string = '/Play'): Promise<void> {
-    this.server = new signalR.HubConnectionBuilder()
+  protected async connect(path: string = '/Play'): Promise<boolean> {
+    this.hub1 = new signalR.HubConnectionBuilder()
       .withUrl(`${urlSocket}${path}`)
       .build();
+    this.hub2 = this.server.withUrl(`${urlSocket}/Play`).build();
 
     try {
-      await this.server.start();
+      await this.hub1.start();
+      await this.hub2.start();
 
-      this.server.on('ClientConnected', () => {
+      this.hub1.on('ClientConnected', () => {
         console.log('server connected');
       });
+
+      return true;
     } catch (error) {
       alert(`Error connect to server, ${urlSocket}: ${error}`);
+      return false;
     }
   }
 
-  async send(methodName: string, ...args: unknown[]): Promise<void> {
+  protected async send(
+    methodName: string,
+    ...args: unknown[]
+  ): Promise<void> {
     if (
-      this.server &&
-      this.server.state === signalR.HubConnectionState.Connected
+      this.hub1 &&
+      this.hub1.state === signalR.HubConnectionState.Connected
     ) {
       try {
-        await this.server?.send(methodName, ...args);
+        await this.hub1?.send(methodName, ...args);
       } catch (error) {
         console.log(error);
       }
     }
   }
 
-  async invoke(
+  protected async invoke<T>(
     methodName: string,
     ...args: unknown[]
-  ): Promise<unknown | null> {
+  ): Promise<SocketResponse<T> | null> {
     try {
-      const response = await this.server?.invoke(methodName, ...args);
+      const response = await this.hub1?.invoke(methodName, ...args);
       return response ?? null;
     } catch (error) {
       console.log(error);
@@ -46,10 +58,34 @@ abstract class SignalRManager {
     }
   }
 
-  close(): void {
-    if (this.server) {
-      this.server.stop();
-      this.server = null;
+  protected async invokeHub2<T>(
+    methodName: string,
+    ...args: unknown[]
+  ): Promise<SocketResponse<T> | null> {
+    try {
+      const response = await this.hub2?.invoke(methodName, ...args);
+      return response ?? null;
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  }
+
+  protected async on(
+    methodName: string,
+    callback: (data: unknown) => void
+  ) {
+    return this.hub1?.on(methodName, callback);
+  }
+
+  protected async off(methodName: string) {
+    return this.hub1?.off(methodName);
+  }
+
+  protected close(): void {
+    if (this.hub1) {
+      this.hub1.stop();
+      this.hub1 = null;
       console.log('close connection');
     }
   }
