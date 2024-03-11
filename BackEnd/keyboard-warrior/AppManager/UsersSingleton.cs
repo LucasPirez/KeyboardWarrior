@@ -13,11 +13,7 @@ namespace keyboard_warrior.AppManager
         {
             string guid = Guid.NewGuid().ToString();
 
-            UserConnection newUser = new UserConnection
-            {
-                UserName = username,
-                Id = guid
-            };
+            UserConnection newUser = new(guid, username);
 
             connectedUsers.TryAdd(username, newUser);
         }

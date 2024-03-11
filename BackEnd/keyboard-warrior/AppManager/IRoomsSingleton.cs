@@ -7,6 +7,7 @@ namespace keyboard_warrior.AppManager
         IEnumerable<RoomDTO> GetRooms();
 
         Room? GetRoom(string id);
+      
 
         RoomDTO? CreateRoom(string userName, string roomName);
 

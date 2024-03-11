@@ -1,5 +1,4 @@
 ﻿using keyboard_warrior.DTOs;
-using keyboard_warrior.Models;
 using System.Collections.Concurrent;
 
 namespace keyboard_warrior.AppManager
@@ -48,6 +47,7 @@ namespace keyboard_warrior.AppManager
             return null;
         }
 
+
         public IEnumerable<RoomDTO> RemoveRoom(string roomId)
         {
             rooms.TryRemove(roomId, out _);
@@ -73,6 +73,7 @@ namespace keyboard_warrior.AppManager
             var user = _users.GetUser(userName);
 
             if(user == null) return false;
+            user.SetReady(false);
 
             if (rooms.TryGetValue(roomId, out Room? currentRoom))
             {
@@ -89,6 +90,9 @@ namespace keyboard_warrior.AppManager
             return false;
 
         }
+
+
+      
     }
 }
 

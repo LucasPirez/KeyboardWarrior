@@ -35,12 +35,9 @@ namespace keyboard_warrior.AppManager
             ListUser.Remove(user);
         }
 
-        public void UpdateStateUser(UserStates state,UserConnection user) {
-            var userToUpdate = ListUser.FirstOrDefault(u => u.UserName == user.UserName);
-            if (userToUpdate != null)
-            {
-                userToUpdate.State = state;
-            }
+        public void UpdateStateUser(bool state,string userName) {
+            var userToUpdate = ListUser.Where(u => u.UserName == userName).FirstOrDefault();
+            userToUpdate?.SetReady(state);
         }
 
         public void SetRoomState(string state)
