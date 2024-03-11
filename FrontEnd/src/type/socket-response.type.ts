@@ -1,5 +1,5 @@
-export interface SocketResponse {
-  data: unknown;
+export interface SocketResponse<T> {
+  data: T;
   message: string;
   code: number;
 }
