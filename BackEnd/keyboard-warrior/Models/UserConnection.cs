@@ -2,11 +2,15 @@
 
 namespace keyboard_warrior.Models
 {
-    public class UserConnection
+    public class UserConnection(string id, string userName)
     {
-        public string Id { get; set; }
-       public string UserName { get; set; } = string.Empty;
+        public string Id { get; private set; } = id;
+        public string UserName { get; private set; } = userName;
+        public bool Ready { get; private set; } = false;
 
-        public UserStates State = UserStates.InHome;
+        public void SetReady(bool ready)
+        {
+            Ready = ready;
+        }
     }
 }
