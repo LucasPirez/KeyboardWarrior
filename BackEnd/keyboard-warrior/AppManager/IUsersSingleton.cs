@@ -7,7 +7,7 @@ namespace keyboard_warrior.AppManager
 
         void RemoveUser(string username);
         bool IsUserExist(string username);
-        void AddUser(string username);
+        void AddUser(string username, string connectionId);
 
         UserConnection? GetUser(string username);
 

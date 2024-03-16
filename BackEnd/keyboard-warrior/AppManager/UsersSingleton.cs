@@ -9,11 +9,11 @@ namespace keyboard_warrior.AppManager
         private ConcurrentDictionary<string, UserConnection> connectedUsers = new ConcurrentDictionary<string, UserConnection>();
 
 
-        public void AddUser(string username)
+        public void AddUser(string username,string connectionId)
         {
             string guid = Guid.NewGuid().ToString();
 
-            UserConnection newUser = new(guid, username);
+            UserConnection newUser = new(guid, username,connectionId);
 
             connectedUsers.TryAdd(username, newUser);
         }
