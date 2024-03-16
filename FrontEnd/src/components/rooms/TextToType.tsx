@@ -1,79 +1,156 @@
-import { FormEvent, useRef, useState } from 'react';
+import {
+  FormEvent,
+  KeyboardEvent,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import styles from './TextToType.module.css';
-import Timer from '../Timer';
+import { SESSION_STORAGE } from '../../constants';
+import { serviceGame } from '../../services';
+import { type Room } from '../../type';
 
 interface Props {
-  text?: string;
-  handleSetPercentage: (percentage: number) => void;
+  room: Room & { text: string };
+  handleSetPercentage: (value: number) => void;
 }
 
 export default function TextToType({
-  text = 'Lorem ipsum dolor master de los americanos aguante maxi y alguna SMITH ya se la va a poner',
+  room,
   handleSetPercentage,
 }: Props) {
-  const textLong = useRef(text.length);
-  const refLetters = useRef({ index: 0 });
-  const [currentChar, setCurrentChar] = useState<{
-    letter: null | string;
-    index: number;
-  }>({ letter: null, index: -1 });
+  const { text: textReceived, id } = room;
+  const [text, setText] = useState<{
+    textRest: string;
+    charToType: string;
+    charTyped: string;
+    textWithNormalSpace: string;
+  }>({
+    charTyped: '',
+    charToType: textReceived[0],
+    textRest: textReceived.substring(1),
+    textWithNormalSpace: textReceived
+      .replace(/\s+/g, ' ')
+      .replace('\n', '')
+      .substring(1),
+  });
+  const [wrongLetter, setWrongLetter] = useState(false);
 
-  const handleInput = (event: FormEvent<HTMLInputElement>) => {
+  const refCurrentIndex = useRef({ index: 0 });
+
+  const refPercentage = useRef<{ value: number }>({ value: 0 });
+  const refInterval = useRef<{ value: number }>({ value: 0 });
+  const inputRef = useRef<HTMLTextAreaElement>(null!);
+
+  const setPercentage = () => {
+    const percentage = Math.ceil(
+      (refCurrentIndex.current.index * 100) /
+        text.textWithNormalSpace.length
+    );
+
+    refPercentage.current.value = percentage;
+    handleSetPercentage(percentage);
+  };
+
+  const handleInput = (event: FormEvent<HTMLTextAreaElement>) => {
     const { value } = event.currentTarget;
     const lastLetter = value[value.length - 1];
 
-    if (lastLetter === text[refLetters.current.index]) {
-      setCurrentChar({
-        index: refLetters.current.index,
-        letter: lastLetter,
-      });
-      ++refLetters.current.index;
+    if (lastLetter === text?.charToType) {
+      setWrongLetter(false);
+      setPercentage();
+
+      refCurrentIndex.current.index++;
+      setText((prev) => ({
+        ...prev,
+        charTyped: prev.charTyped + lastLetter,
+        charToType: prev.textRest[0],
+        textRest: prev.textRest.substring(1),
+      }));
     } else {
-      setCurrentChar({
-        index: refLetters.current.index,
-        letter: lastLetter,
-      });
+      setWrongLetter(true);
     }
   };
 
+  const handleKeyDown = (
+    event: KeyboardEvent<HTMLTextAreaElement>
+  ) => {
+    const { code } = event;
+
+    if (code === 'Enter' && text.charToType === '\n') {
+      setWrongLetter(false);
+      setPercentage();
+
+      const nextChar =
+        text.textWithNormalSpace[refCurrentIndex.current.index];
+      const nextIndex = text.textRest.indexOf(nextChar);
+
+      setText((prev) => ({
+        ...prev,
+        charTyped: prev.charTyped + `\n   `,
+        charToType: nextChar,
+        textRest: prev.textRest.substring(nextIndex + 1),
+      }));
+
+      refCurrentIndex.current.index++;
+    } else {
+      setWrongLetter(true);
+    }
+  };
+
+  const userName = window.sessionStorage.getItem(SESSION_STORAGE);
+
+  useEffect(() => {
+    refInterval.current.value = setInterval(() => {
+      serviceGame.percentageTyped(
+        refPercentage.current?.value ?? 0,
+        userName ?? '',
+        id ?? ''
+      );
+      if (refPercentage.current?.value === 100) {
+        clearInterval(refInterval.current.value);
+        serviceGame.finishGame({
+          userName: userName ?? '',
+          roomId: room.id,
+        });
+      }
+    }, 1000);
+
+    return () => {
+      clearInterval(refInterval.current.value);
+    };
+  }, []);
+
   return (
     <>
-      <Timer />
+      {/* <Timer /> */}
       <div className={styles.container}>
-        <input
-          type="text"
+        <textarea
           className={styles.inputHidden}
           onInput={handleInput}
-          autoFocus
-        />
-        {text.split('').map((charText, textIndex) => {
-          let classString;
-          if (currentChar.index > textIndex) {
-            classString = styles.correctLetter;
-          } else if (currentChar.index === textIndex) {
-            handleSetPercentage(
-              (currentChar.index * 100) / textLong.current
-            );
-            classString =
-              currentChar.letter === charText
-                ? styles.correctLetter
-                : styles.incorrectLetter;
-          }
-
-          return (
-            <span
-              key={textIndex + '' + Math.random()}
-              className={classString}>
-              <span
-                className={`${styles.span} ${
-                  currentChar.index === textIndex &&
-                  styles.lastCorrectLetter
-                }`}>
-                {charText}
-              </span>
+          onBlur={() => inputRef?.current?.focus()}
+          ref={inputRef}
+          onKeyDown={handleKeyDown}
+          autoFocus></textarea>
+        <pre>
+          <code>
+            <span style={{ color: 'navy' }}>
+              {text && text.charTyped}
             </span>
-          );
-        })}
+            <span
+              style={{
+                background: `${
+                  wrongLetter ? 'red' : 'var(--primary-color)'
+                }`,
+              }}
+              className={`${
+                text.charToType === '\n' ? styles.space : ''
+              }`}>
+              {text && text.charToType}
+            </span>
+            {text && text.textRest}
+          </code>
+        </pre>
       </div>
     </>
   );
