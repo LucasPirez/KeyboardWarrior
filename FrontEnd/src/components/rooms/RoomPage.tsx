@@ -1,22 +1,27 @@
-import { ProgressBar } from 'primereact/progressbar';
-import TextContainer from './TextContainer';
 import { useEffect, useRef, useState } from 'react';
 import { Room } from '../../type';
 import { serviceGame } from '../../services';
-// import { SOCKET_MESSAGES } from '../../constants/socket-messages';
 import { BackToRooms } from '../buttons';
-import { SESSION_STORAGE } from '../../constants';
+import { ROOM_STATES, SESSION_STORAGE } from '../../constants';
+import { useContextRoom } from './contextRoom';
+import ListUsers from './ListUsers';
+import { SOCKET_MESSAGES } from '../../constants/socket-messages';
+import RenderGame from './RenderGame';
+import TablePosition from './TablePosition';
+
+import styles from './roomPage.module.css';
 
 export default function RoomPage() {
-  const [percentageState, setPercentageState] = useState(0);
-  const [room, setRoom] = useState<Room | null>(null);
   const refIds = useRef<
     { id: string; userName: string } | undefined
   >();
-
-  const handleSetPercentage = (percentage: number) => {
-    setPercentageState(Math.floor(percentage));
-  };
+  const {
+    handleSetUsers,
+    room,
+    handleSetRoom,
+    handleSetRoomState,
+    handleSetText,
+  } = useContextRoom();
 
   useEffect(() => {
     (async () => {
@@ -34,42 +39,55 @@ export default function RoomPage() {
 
       if (id) {
         const getRoom = await serviceGame.getRoom(id);
-        setRoom(getRoom);
+
+        if (getRoom?.data) {
+          handleSetUsers(getRoom?.data.listUser ?? []);
+          handleSetRoom(getRoom.data);
+        }
       }
 
       await serviceGame.listen('hola', (data) => {
-        setRoom(data as Room);
+        handleSetRoom(data as Room);
+        handleSetUsers((data as Room).listUser ?? []);
+      });
+      serviceGame.listen(SOCKET_MESSAGES.START_PLAY_TIMER, () => {
+        handleSetRoomState(ROOM_STATES.TIMER);
+      });
+
+      serviceGame.listen(SOCKET_MESSAGES.START_GAME, (text) => {
+        handleSetRoomState(ROOM_STATES.PLAYING);
+        handleSetText(text as string);
       });
     })();
 
     return () => {
-      serviceGame.removeListen('hola');
       serviceGame.removeUser(
         refIds.current?.id ?? '',
         refIds.current?.userName ?? ''
       );
+      serviceGame.removeListen('hola');
+      serviceGame.removeListen(SOCKET_MESSAGES.START_PLAY_TIMER);
+      serviceGame.removeListen(SOCKET_MESSAGES.START_GAME);
     };
   }, []);
 
+  const [percentage, setPercentage] = useState(0);
+
+  const handleSetPercentage = (value: number) => {
+    setPercentage(Math.round(value));
+  };
+
   return (
     <>
+      <TablePosition />
       <div>
         {room ? (
           <>
             <h2>{room.name}</h2>
             <BackToRooms roomId={room.id} />
-            <section>
-              <article>
-                {room.listUser.map((user) => (
-                  <div key={user.id}>
-                    <h3>{user.userName}</h3>
-                    <ProgressBar value={percentageState} />
-                  </div>
-                ))}
-              </article>
-              <TextContainer
-                handleSetPercentage={handleSetPercentage}
-              />
+            <section className={styles.subContainer}>
+              <ListUsers percentageUser={percentage} />
+              <RenderGame handleSetPercentage={handleSetPercentage} />
             </section>
           </>
         ) : (

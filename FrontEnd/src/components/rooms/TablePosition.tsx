@@ -1,15 +1,20 @@
 import { Badge } from 'primereact/badge';
-
-import styles from './TablePosition.module.css';
 import { useEffect, useState } from 'react';
 import { serviceGame } from '../../services';
 import { SOCKET_MESSAGES } from '../../constants';
 import { FinishGameData } from '../../type';
+import { Button } from 'primereact/button';
+
+import styles from './TablePosition.module.css';
+import 'primeicons/primeicons.css';
+import { useUser } from '../../hooks/useUser';
 
 type Position = { userName: string; position: number };
 
 export default function TablePosition() {
   const [positions, setPositions] = useState<Position[]>([]);
+  const [showInModal, setShowInModal] = useState<boolean>(false);
+  const { userName: userNameStorage } = useUser();
 
   useEffect(() => {
     (async () => {
@@ -22,6 +27,10 @@ export default function TablePosition() {
             userName,
             position: parseInt(timesStamp),
           };
+
+          console.log(userName, userNameStorage);
+
+          if (userName === userNameStorage) setShowInModal(true);
 
           setPositions((prev) => {
             const newOrder = [...prev, newPosition].sort((a, b) => {
@@ -43,16 +52,32 @@ export default function TablePosition() {
     1: 'info',
     2: 'warning',
   };
+  console.log(showInModal);
 
   return (
-    <section className={styles.container}>
-      <h2>Position</h2>
+    <section
+      className={`${styles.container} ${
+        !showInModal ? styles.normalContainer : styles.modalContainer
+      }`}>
+      <div className={styles.headerContainer}>
+        <h2>Position</h2>
+
+        {showInModal && (
+          <Button
+            icon="pi pi-times"
+            rounded
+            severity="danger"
+            aria-label="Cancel"
+            onClick={() => setShowInModal(false)}
+          />
+        )}
+      </div>
       {positions.map((position, index) => {
         if (index > Object.keys(severity).length - 1) {
           return;
         }
         return (
-          <div>
+          <div key={'tablePosition--' + position.userName}>
             <Badge
               className={styles.badge}
               value={index + 1}

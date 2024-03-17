@@ -5,17 +5,21 @@ import { navigateTo } from '../../helpers';
 
 interface Props {
   roomId: string;
+  disabled?: boolean;
 }
 
-export default function JoinRoom({ roomId }: Props) {
+export default function JoinRoom({
+  roomId,
+  disabled = false,
+}: Props) {
   const handleClick = async () => {
     const userName = window.sessionStorage.getItem(SESSION_STORAGE);
 
     if (userName !== null) {
       const response = await serviceGame.joinRoom(roomId, userName);
 
-      if (response.code !== 200) {
-        throw new Error(response.message);
+      if (response?.code !== 200) {
+        throw new Error(response?.message);
       }
 
       navigateTo({
@@ -25,5 +29,12 @@ export default function JoinRoom({ roomId }: Props) {
     }
   };
 
-  return <Button label="Join to Room" raised onClick={handleClick} />;
+  return (
+    <Button
+      label="Join to Room"
+      raised
+      onClick={handleClick}
+      disabled={disabled}
+    />
+  );
 }

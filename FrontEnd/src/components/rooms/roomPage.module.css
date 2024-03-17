@@ -1,0 +1,7 @@
+.subContainer {
+  margin: auto;
+  width: 90vw;
+  justify-content: space-between;
+  display: flex;
+  flex-wrap: wrap;
+}

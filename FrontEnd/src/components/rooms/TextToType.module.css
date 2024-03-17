@@ -11,30 +11,30 @@
   scale: 0;
 }
 
-/* .lastCorrectLetter::before {
-  content: '';
-  height: 2px;
-  width: 100%;
-  background-color: var(--cyan-700);
-  position: absolute;
-  bottom: 3px;
-  right: 0px;
-} */
-
-.span {
-  opacity: 0.95;
-}
-
 .correctLetter {
   color: var(--gray-800);
-  opacity: 1;
+  opacity: 0.5;
   position: relative;
+  animation: indicator 1s infinite;
 }
 
 .incorrectLetter {
   color: var(--red-600);
 }
 
-.incorrectLetter > span {
-  opacity: 1;
+.space::before {
+  content: '\23CE';
+  display: inline-block;
+}
+
+@keyframes indicator {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 1;
+  }
 }
