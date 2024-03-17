@@ -1,4 +1,16 @@
 export const SOCKET_MESSAGES = {
   LOGIN: 'Login',
   CREATE_ROOM: 'CreateRoom',
-};
+  GET_ROOMS: 'GetRooms',
+  GET_ROOM: 'GetRoom',
+  DELETE_ROOM: 'deleteRoom',
+  CHANGE_USER_ROOM: 'ChangeUserInRoom',
+  JOIN_ROOM: 'JoinRoom',
+  REMOVE_USER: 'RemoveUserRoom',
+  READY: 'Ready',
+  NOT_READY: 'NotReady',
+  TEXT_TYPED_PERCENTAGE: 'TextTypedPercentage',
+  START_PLAY_TIMER: 'StartPlayTimer',
+  START_GAME: 'StartGame',
+  FINISH_GAME: 'FinishGame',
+} as const;
