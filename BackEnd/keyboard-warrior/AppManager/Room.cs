@@ -2,22 +2,37 @@
 using keyboard_warrior.enums;
 using keyboard_warrior.Hubs;
 using keyboard_warrior.Models;
+using Newtonsoft.Json.Linq;
 
 namespace keyboard_warrior.AppManager
 {
     public class Room 
     {
+
         private string Id { get; set; } = Guid.NewGuid().ToString();
 
         private string Name { get; set; }
 
         private List<UserConnection> ListUser = new();
 
-        private string State { get; set; } = RoomState.Waiting;
+        private RoomState State { get; set; } = RoomState.Waiting;
+
+        private RoomTextType RoomType { get; set; }
+        
 
 
-        public Room(string name)
+        public Room(string name,string typeTextRoom)
         {
+
+            if (typeTextRoom == RoomTextType.Javascript.ToString() || typeTextRoom == RoomTextType.NormalText.ToString())
+            {
+                RoomType = typeTextRoom == RoomTextType.Javascript.ToString() ? RoomTextType.Javascript : RoomTextType.NormalText;
+            }
+            else
+            {
+                throw new ArgumentException("Value 'Roomtype' dosn't permited");
+            }
+
             Name = name;
         }
         public List<UserConnection> GetUsers()
@@ -40,17 +55,12 @@ namespace keyboard_warrior.AppManager
             userToUpdate?.SetReady(state);
         }
 
-        public void SetRoomState(string state)
+        public void SetRoomState(RoomState state)
         {
-            if (state == RoomState.Waiting || state == RoomState.Playing)
-            {
-                State = state;
-            }
-            else
-            {
-                throw new ArgumentException("Valor no válido para RoomState", nameof(state));
-            }
+                State = state;      
         }
+
+    
 
         public RoomDTO GetRoomDTO()
         {
@@ -58,8 +68,9 @@ namespace keyboard_warrior.AppManager
             {
                 ListUser = ListUser,
                 Name = Name,
-                State = State,
-                Id = Id
+                State = State.ToString(),
+                Id = Id,
+                RoomType = RoomType.ToString()
             };
         }
 
@@ -68,5 +79,10 @@ namespace keyboard_warrior.AppManager
             return ListUser.Count;
         }
 
+
+        public RoomTextType GetRoomTextType()
+        {
+            return RoomType;
+        }
     }
 }

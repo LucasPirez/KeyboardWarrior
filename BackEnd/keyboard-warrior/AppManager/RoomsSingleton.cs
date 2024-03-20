@@ -13,24 +13,13 @@ namespace keyboard_warrior.AppManager
             return rooms.Values.Select(a => a.GetRoomDTO());
         }
       
-        public  RoomDTO? CreateRoom(string userName,string roomName )
+        public  RoomDTO? CreateRoom(string roomName,string typeTextRoom )
         {
-            Room room = new Room(roomName);
-
-            var user = _users.GetUser(userName);
-            if (user == null) return null;           
-
-             room.AddUser(user);
+            Room room = new Room(roomName, typeTextRoom);         
 
             if(rooms.TryAdd(room.GetRoomDTO().Id, room))
             {
-             return new RoomDTO
-            {
-                Id=room.GetRoomDTO().Id,
-                ListUser= room.GetRoomDTO().ListUser,
-                Name=room.GetRoomDTO().Name,
-                State = room.GetRoomDTO().State,
-            };
+                return room.GetRoomDTO();
             }
             else
             {
@@ -90,9 +79,36 @@ namespace keyboard_warrior.AppManager
             return false;
 
         }
+        /**
+         * 
+         * return roomId or null
+         */
+        public string? RemoveUser(string userName)
+        {
+            var user = _users.GetUser(userName);
+
+            if (user == null) return null;
+
+            var currentRoom = rooms.Values.FirstOrDefault(u => u.GetUsers().Contains(user));
+         
+            if (currentRoom != null) { 
+                currentRoom.RemoveUser(user);
+                int usersCount = currentRoom.GetUsersCount();
+
+                if (usersCount == 0)
+                {
+                    rooms.TryRemove(currentRoom.GetRoomDTO().Id, out _);
+                }
+                 return   currentRoom.GetRoomDTO().Id;
+            }
+
+            return null;
+           
+
+        }
 
 
-      
+
     }
 }
 

@@ -51,5 +51,10 @@ namespace keyboard_warrior.AppManager
                 return null;
             }
         }
+
+        public UserConnection? GetUserByConnectionId(string connectionId)
+        {
+          return connectedUsers.Values.FirstOrDefault(u => u.ConnectionId == connectionId);
+        }
     }
 }

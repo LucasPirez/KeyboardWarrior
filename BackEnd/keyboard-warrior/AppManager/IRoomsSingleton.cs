@@ -9,12 +9,13 @@ namespace keyboard_warrior.AppManager
         Room? GetRoom(string id);
       
 
-        RoomDTO? CreateRoom(string userName, string roomName);
+        RoomDTO? CreateRoom(string roomName,string typeTextRoom);
 
         IEnumerable<RoomDTO> RemoveRoom(string roomId);
 
         bool AddUser(string user, string roomId);
 
         bool RemoveUser(string userName, string roomId);
+        string? RemoveUser(string userName);
     }
 }

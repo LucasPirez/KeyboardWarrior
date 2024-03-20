@@ -10,6 +10,7 @@ namespace keyboard_warrior.AppManager
         void AddUser(string username, string connectionId);
 
         UserConnection? GetUser(string username);
+        UserConnection? GetUserByConnectionId(string connectionId);
 
         string See();
     }
