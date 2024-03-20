@@ -2,24 +2,21 @@ import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { useState } from 'react';
 import { PATH } from '../constants/paths';
-
 import styles from './login.module.css';
-import { serviceGame } from '../services';
-import { SESSION_STORAGE } from '../constants/storage';
+import { useLogin } from '../hooks/useLogin';
 
 export default function Login() {
   const [value, setValue] = useState('');
+  const { login } = useLogin();
 
   const handleLogin = async () => {
     try {
-      const socketResponse = await serviceGame.login(value);
+      const result = await login(value);
 
-      if (!socketResponse) {
-        alert('The userName is already exist');
-        return;
+      if (result) {
+        console.log(result);
+        window.location.hash = PATH.rooms;
       }
-      window.sessionStorage.setItem(SESSION_STORAGE, value);
-      window.location.hash = PATH.rooms;
     } catch (error) {
       console.log(error);
     }

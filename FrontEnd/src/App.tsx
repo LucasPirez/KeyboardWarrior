@@ -1,35 +1,61 @@
 import { useEffect, useState } from 'react';
-import * as signalR from '@microsoft/signalr';
-import { urlSocket } from './constants/url-socket';
-import Room from './components/InfoRoom';
-import CreateRoom from './components/CreateRoom';
 import Login from './components/Login';
-import RoomPage from './components/rooms/RoomPage';
 import { PATH, PathType } from './constants/paths';
+import { serviceGame } from './services';
+import Home from './components/Home';
+import Father from './components/rooms/Father';
+import { useLogin } from './hooks/useLogin';
+import { useUser } from './hooks/useUser';
 
 function App() {
-  const [currentPath, setCurrentPath] = useState<PathType>('/login');
+  const [currentPath, setCurrentPath] = useState<
+    PathType | undefined
+  >();
+  const { login } = useLogin();
+  const { userName } = useUser();
+
+  const handleAuth = async () => {
+    if (!userName) {
+      window.location.hash = PATH.login;
+      setCurrentPath(PATH.login);
+      return;
+    }
+  };
+
+  const handleSplitHash = (hash: string) => {
+    if (!hash.includes('#/')) {
+      window.location.hash = PATH.login;
+      return '/login';
+    }
+
+    return hash.split('?')[0].replace('#', '');
+  };
 
   useEffect(() => {
     (async () => {
-      const connection = new signalR.HubConnectionBuilder()
-        .withUrl(`${urlSocket}/Play`)
-        .build();
+      await handleAuth();
+      const response = await serviceGame.connectGame();
 
-      await connection.start();
+      if (!response) {
+        setCurrentPath(PATH.error);
+        throw new Error('Error in socket connections');
+      }
+      userName && (await login(userName));
 
-      connection.invoke('JoinPlay', { UserName: 'Usuario1' });
-
-      connection.on('ReceiveMessage', (message, a) => {
-        console.log('mesage recibido', message, a);
-      });
+      setCurrentPath(
+        handleSplitHash(window.location.hash) as PathType
+      );
     })();
+
+    return () => {
+      serviceGame.close();
+    };
   }, []);
 
   useEffect(() => {
     const handleLocationChange = () => {
       setCurrentPath(
-        window.location.hash.replace('#', '') as PathType
+        handleSplitHash(window.location.hash) as PathType
       );
     };
     window.addEventListener('popstate', handleLocationChange);
@@ -39,33 +65,14 @@ function App() {
     };
   }, []);
 
-  // const handleEnviar = async () => {
-  // const connection = new signalR.HubConnectionBuilder()
-  //   .withUrl(`${urlSocket}/room`)
-  //   .build();
-
-  // await connection.start();
-
-  // connection.invoke('GetResponse', 'hola mastre');
-
-  // connection.on('get', (message, a) => {
-  //   console.log('mesage recibido', message, a);
-  // });
-
-  // };
-
   const pageToRender = {
-    [PATH.game]: <RoomPage />,
+    [PATH.game]: <Father />,
     [PATH.login]: <Login />,
-    [PATH.rooms]: (
-      <>
-        <CreateRoom />
-        <Room />
-      </>
-    ),
+    [PATH.rooms]: <Home />,
+    [PATH.error]: <h1>some error has ocurred</h1>,
   };
 
-  return pageToRender[currentPath];
+  return currentPath ? pageToRender[currentPath] : <h2>leading</h2>;
 }
 
 export default App;
