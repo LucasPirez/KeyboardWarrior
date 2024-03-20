@@ -1,26 +1,27 @@
 .container {
+  position: absolute;
   padding: 0 20px 20px 20px;
   background-color: var(--primary-color);
   box-shadow: 0 0 10px var(--highlight-text-color);
   color: var(--primary-color-text);
   font-weight: 500;
   border-radius: 5px;
-
   z-index: 99;
+  text-wrap: nowrap;
+  overflow: hidden;
 }
 
 .normalContainer {
-  position: absolute;
   right: 0;
   top: 0;
   margin: 10px;
 }
 
 .modalContainer {
-  position: absolute;
-  height: 300px;
-  width: 400px;
+  height: auto;
+  width: 300px;
   top: 20vh;
+  padding-left: 4cqh;
   left: calc(50vw - 200px);
 }
 
@@ -38,6 +39,19 @@
   margin-top: 10px;
 }
 
+.modalContainer div {
+  margin-top: 20px;
+}
+
 .badge {
   margin-right: 10px;
+}
+
+.modalContainer .badge {
+  margin-right: 35px;
+  transform: scale(1.4);
+}
+
+.modalContainer .userName {
+  font-size: 1.8rem;
 }

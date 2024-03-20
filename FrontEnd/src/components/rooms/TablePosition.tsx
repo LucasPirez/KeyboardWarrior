@@ -28,8 +28,6 @@ export default function TablePosition() {
             position: parseInt(timesStamp),
           };
 
-          console.log(userName, userNameStorage);
-
           if (userName === userNameStorage) setShowInModal(true);
 
           setPositions((prev) => {
@@ -52,7 +50,6 @@ export default function TablePosition() {
     1: 'info',
     2: 'warning',
   };
-  console.log(showInModal);
 
   return (
     <section
@@ -60,7 +57,7 @@ export default function TablePosition() {
         !showInModal ? styles.normalContainer : styles.modalContainer
       }`}>
       <div className={styles.headerContainer}>
-        <h2>Position</h2>
+        <h2>POSITION</h2>
 
         {showInModal && (
           <Button
@@ -77,15 +74,19 @@ export default function TablePosition() {
           return;
         }
         return (
-          <div key={'tablePosition--' + position.userName}>
-            <Badge
-              className={styles.badge}
-              value={index + 1}
-              size={'normal'}
-              severity={severity[index]}
-            />
-            <span>{position.userName}</span>
-          </div>
+          <>
+            <div key={'tablePosition--' + position.userName}>
+              <Badge
+                className={styles.badge}
+                value={index + 1}
+                size={'normal'}
+                severity={severity[index]}
+              />
+              <span className={styles.userName}>
+                {position.userName}
+              </span>
+            </div>
+          </>
         );
       })}
     </section>
