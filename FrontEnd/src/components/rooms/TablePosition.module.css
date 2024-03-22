@@ -21,7 +21,7 @@
   height: auto;
   width: 300px;
   top: 20vh;
-  padding-left: 4cqh;
+  padding-left: 20px;
   left: calc(50vw - 200px);
 }
 
@@ -39,6 +39,11 @@
   margin-top: 10px;
 }
 
+.containerNames {
+  display: flex;
+  align-items: center;
+}
+
 .modalContainer div {
   margin-top: 20px;
 }
@@ -48,10 +53,11 @@
 }
 
 .modalContainer .badge {
-  margin-right: 35px;
-  transform: scale(1.4);
+  margin-right: 30px;
+  transform: scale(1.3);
 }
 
 .modalContainer .userName {
-  font-size: 1.8rem;
+  font-size: 1.6rem;
+  transform: translate(0, -2px);
 }

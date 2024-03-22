@@ -75,7 +75,9 @@ export default function TablePosition() {
         }
         return (
           <>
-            <div key={'tablePosition--' + position.userName}>
+            <div
+              key={'tablePosition--' + position.userName}
+              className={styles.containerNames}>
               <Badge
                 className={styles.badge}
                 value={index + 1}
