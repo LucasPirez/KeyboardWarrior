@@ -10,6 +10,8 @@ namespace keyboard_warrior.DTOs
 
         public List<UserConnection> ListUser { get; set; } = new();
 
-        public string State { get; set; } = RoomState.Waiting;
+        public string State { get; set; } = RoomState.Waiting.ToString();
+
+        public string RoomType { get; set; }  = string.Empty;
     }
 }
