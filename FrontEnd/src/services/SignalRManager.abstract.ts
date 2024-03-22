@@ -1,22 +1,17 @@
 import * as signalR from '@microsoft/signalr';
 import { urlSocket } from '../constants/url-socket';
-import { SocketResponse } from '../type/socket-response.type';
+import { SocketResponse } from '../type/socket-response';
 
 abstract class SignalRManager {
   private server: signalR.HubConnectionBuilder =
     new signalR.HubConnectionBuilder();
   private hub1: signalR.HubConnection | null = null;
-  private hub2: signalR.HubConnection | null = null;
 
   protected async connect(path: string = '/Play'): Promise<boolean> {
-    this.hub1 = new signalR.HubConnectionBuilder()
-      .withUrl(`${urlSocket}${path}`)
-      .build();
-    this.hub2 = this.server.withUrl(`${urlSocket}/Play`).build();
+    this.hub1 = this.server.withUrl(`${urlSocket}${path}`).build();
 
     try {
       await this.hub1.start();
-      await this.hub2.start();
 
       this.hub1.on('ClientConnected', () => {
         console.log('server connected');
@@ -58,19 +53,6 @@ abstract class SignalRManager {
     }
   }
 
-  protected async invokeHub2<T>(
-    methodName: string,
-    ...args: unknown[]
-  ): Promise<SocketResponse<T> | null> {
-    try {
-      const response = await this.hub2?.invoke(methodName, ...args);
-      return response ?? null;
-    } catch (error) {
-      console.log(error);
-      return null;
-    }
-  }
-
   protected async on(
     methodName: string,
     callback: (data: unknown) => void
@@ -82,7 +64,7 @@ abstract class SignalRManager {
     return this.hub1?.off(methodName);
   }
 
-  protected close(): void {
+  public async close(): Promise<void> {
     if (this.hub1) {
       this.hub1.stop();
       this.hub1 = null;
