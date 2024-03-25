@@ -1,9 +1,11 @@
+import { serviceGame } from '../../services';
 import { ROOM_STATES } from '../../constants';
 import { type Room, type RoomStateType, type User } from '../../type';
 import {
   ReactNode,
   createContext,
   useContext,
+  useEffect,
   useState,
 } from 'react';
 
@@ -16,7 +18,11 @@ interface State {
     }
   >;
   roomState: RoomStateType;
-  usersCount: number;
+  usersResult: {
+    positions: Position[];
+    userEnd: Record<string, boolean>;
+    reset: boolean;
+  };
   room: (Room & { text: string }) | null;
   handleSetUsers: (users: User[]) => void;
   handleSetRoomState: (room: RoomStateType) => void;
@@ -27,6 +33,9 @@ interface State {
   }) => void;
   handleSetRoom: (getRoom: Room) => void;
   handleSetText: (text: string) => void;
+  handleSetUserEnd: (userName: string) => void;
+  handleSetPositions: (position: Position) => void;
+  handleResetRoom: (getRoom: Room) => void;
 }
 
 const ContextRoom = createContext<State>({
@@ -34,13 +43,17 @@ const ContextRoom = createContext<State>({
   usersPlayState: {},
   room: null,
   roomState: ROOM_STATES.WAITING,
-  usersCount: 0,
+  usersResult: { positions: [], userEnd: {}, reset: false },
   handleSetUsers: () => {},
   handleSetRoomState: () => {},
   handleSetRoom: () => {},
   handleSetUsersState: () => {},
   handleSetText: () => {},
+  handleSetPositions: () => {},
+  handleSetUserEnd: () => {},
+  handleResetRoom: () => {},
 });
+type Position = { userName: string; position: number };
 
 export default function ContextRoomProvider({
   children,
@@ -55,9 +68,38 @@ export default function ContextRoomProvider({
   const [room, setRoom] = useState<(Room & { text: string }) | null>(
     null
   );
+  const [usersResult, setUsersResult] = useState<{
+    positions: Position[];
+    userEnd: Record<string, boolean>;
+    reset: boolean;
+  }>({ positions: [], userEnd: {}, reset: false });
 
-  const handleSetUsers = (users: User[]): void => {
-    setUsers(users);
+  useEffect(() => {
+    const arr = Object.entries(usersResult.userEnd);
+    const isUsersEnd = arr.filter(([, bool]) => bool === false);
+
+    (async () => {
+      if (isUsersEnd.length === 0) {
+        serviceGame.restartRoom({ roomId: room?.id ?? '' });
+      }
+    })();
+  }, [usersResult.userEnd]);
+
+  const handleSetUsers = (usersParam: User[]): void => {
+    setUsers(usersParam);
+
+    setUsersResult((prev) => ({
+      positions: prev.positions,
+      userEnd: {},
+      reset: true,
+    }));
+
+    usersParam.forEach((user) =>
+      setUsersResult((prev) => ({
+        ...prev,
+        userEnd: { ...prev.userEnd, [user.userName]: false },
+      }))
+    );
   };
 
   const handleSetRoom = (getRoom: Room) => {
@@ -88,6 +130,40 @@ export default function ContextRoomProvider({
     setUsersPlayState((prev) => ({ ...prev, ...userObj }));
   };
 
+  const handleSetUserEnd = (userName: string) => {
+    setUsersResult((prev) => ({
+      ...prev,
+      userEnd: { ...prev.userEnd, [userName]: true },
+    }));
+  };
+
+  const handleSetPositions = (position: Position) => {
+    if (!usersResult.reset) {
+      setUsersResult((prev) => {
+        const newOrder = [...prev.positions, position].sort(
+          (a, b) => {
+            return a.position - b.position;
+          }
+        );
+        return { ...prev, positions: newOrder };
+      });
+    } else {
+      setUsersResult((prev) => {
+        return { ...prev, positions: [position], reset: false };
+      });
+    }
+  };
+
+  const handleResetRoom = (getRoom: Room) => {
+    handleSetUsers(getRoom.listUser);
+    handleSetRoom(getRoom);
+    handleSetRoomState(ROOM_STATES.WAITING);
+
+    getRoom.listUser.forEach((user) =>
+      handleSetUsersState({ [user.userName]: { percentage: 0 } })
+    );
+  };
+
   const data = {
     users,
     roomState,
@@ -98,7 +174,11 @@ export default function ContextRoomProvider({
     handleSetUsersState,
     room,
     handleSetText,
+    usersResult,
     handleSetRoom,
+    handleSetUserEnd,
+    handleResetRoom,
+    handleSetPositions,
   };
 
   return (

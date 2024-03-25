@@ -4,15 +4,16 @@ import { serviceGame } from '../../services';
 import { SOCKET_MESSAGES } from '../../constants';
 import { FinishGameData } from '../../type';
 import { Button } from 'primereact/button';
-
 import styles from './TablePosition.module.css';
 import 'primeicons/primeicons.css';
 import { useUser } from '../../hooks/useUser';
+import { useContextRoom } from './contextRoom';
 
 type Position = { userName: string; position: number };
 
 export default function TablePosition() {
-  const [positions, setPositions] = useState<Position[]>([]);
+  const { handleSetUserEnd, room, handleSetPositions, usersResult } =
+    useContextRoom();
   const [showInModal, setShowInModal] = useState<boolean>(false);
   const { userName: userNameStorage } = useUser();
 
@@ -28,14 +29,9 @@ export default function TablePosition() {
             position: parseInt(timesStamp),
           };
 
+          handleSetPositions(newPosition);
+          handleSetUserEnd(userName);
           if (userName === userNameStorage) setShowInModal(true);
-
-          setPositions((prev) => {
-            const newOrder = [...prev, newPosition].sort((a, b) => {
-              return a.position - b.position;
-            });
-            return newOrder;
-          });
         }
       );
     })();
@@ -43,7 +39,8 @@ export default function TablePosition() {
     return () => {
       serviceGame.removeListen(SOCKET_MESSAGES.FINISH_GAME);
     };
-  }, []);
+  }, [usersResult.positions, room?.listUser]);
+  console.log(usersResult);
 
   const severity: Record<number, 'success' | 'warning' | 'info'> = {
     0: 'success',
@@ -69,7 +66,7 @@ export default function TablePosition() {
           />
         )}
       </div>
-      {positions.map((position, index) => {
+      {usersResult.positions.map((position, index) => {
         if (index > Object.keys(severity).length - 1) {
           return;
         }
