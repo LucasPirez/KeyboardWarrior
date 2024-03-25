@@ -13,4 +13,5 @@ export const SOCKET_MESSAGES = {
   START_PLAY_TIMER: 'StartPlayTimer',
   START_GAME: 'StartGame',
   FINISH_GAME: 'FinishGame',
+  RESTART_ROOM: 'RestartRoom',
 } as const;

@@ -147,4 +147,7 @@ export class GameService
     const message = `${userName}-${time}`;
     await this.send(SOCKET_MESSAGES.FINISH_GAME, message, roomId);
   }
+  async restartRoom({ roomId }: { roomId: string }): Promise<void> {
+    await this.send(SOCKET_MESSAGES.RESTART_ROOM, roomId);
+  }
 }
