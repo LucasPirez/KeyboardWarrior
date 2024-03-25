@@ -50,17 +50,22 @@ namespace keyboard_warrior.AppManager
             ListUser.Remove(user);
         }
 
-        public void UpdateStateUser(bool state,string userName) {
+        public void UpdateStateUser(bool state,string? userName) {
+            if(userName == null)
+            {
+                ListUser.ForEach(u => u.SetReady(false));
+            }
+            else
+            { 
             var userToUpdate = ListUser.Where(u => u.UserName == userName).FirstOrDefault();
             userToUpdate?.SetReady(state);
+            }
         }
 
         public void SetRoomState(RoomState state)
         {
                 State = state;      
         }
-
-    
 
         public RoomDTO GetRoomDTO()
         {
@@ -84,5 +89,6 @@ namespace keyboard_warrior.AppManager
         {
             return RoomType;
         }
+
     }
 }

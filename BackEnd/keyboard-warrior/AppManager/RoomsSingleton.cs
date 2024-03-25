@@ -1,4 +1,5 @@
 ﻿using keyboard_warrior.DTOs;
+using keyboard_warrior.enums;
 using System.Collections.Concurrent;
 
 namespace keyboard_warrior.AppManager
@@ -73,7 +74,6 @@ namespace keyboard_warrior.AppManager
                 {
                     rooms.TryRemove(roomId, out _);
                 }
-
                 return true;
             }
             return false;
@@ -107,7 +107,17 @@ namespace keyboard_warrior.AppManager
 
         }
 
+        public Room? RestartRoom(string roomId)   
+        {
+            var room = GetRoom(roomId);
 
+            if (room == null) return null;
+
+            room.SetRoomState(RoomState.Waiting);
+            room.UpdateStateUser(false, null);
+
+            return room;
+        }
 
     }
 }

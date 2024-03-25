@@ -23,10 +23,40 @@ namespace keyboard_warrior.Hubs
             await base.OnConnectedAsync();
         }
 
-        
-        public SocketResponseDTO Login(string userName)
+        public override async Task OnDisconnectedAsync(Exception exception)
         {
 
+            var user = _stateUsers.GetUserByConnectionId(Context.ConnectionId);
+
+            if (user != null)
+            {
+
+             string? roomId = _roomsState.RemoveUser(user.UserName);
+                
+                _stateUsers.RemoveUser(user.UserName);
+
+                if(roomId != null)
+                {
+                var room = _roomsState.GetRoom(roomId)?.GetRoomDTO();
+                await Groups.RemoveFromGroupAsync(Context.ConnectionId, roomId);
+                if (room == null)
+                {
+                    await Clients.All.SendAsync("DeleteRoom", roomId);
+                }
+                else
+                {
+                    await Clients.All.SendAsync("ChangeUserInRoom", room);
+                    await Clients.Group(roomId).SendAsync("hola", room);
+                }
+                }
+
+            }
+
+            await base.OnDisconnectedAsync(exception);
+        }
+
+        public SocketResponseDTO Login(string userName)
+        {
             if (_stateUsers.IsUserExist(userName))
             {
                 return new SocketResponseDTO()
@@ -37,7 +67,7 @@ namespace keyboard_warrior.Hubs
                 };
             }
 
-            _stateUsers.AddUser(userName,Context.ConnectionId);
+            _stateUsers.AddUser(userName, Context.ConnectionId);
 
             return new SocketResponseDTO()
             {
@@ -48,7 +78,7 @@ namespace keyboard_warrior.Hubs
             };
         }
 
-        public async Task<SocketResponseDTO> CreateRoom(string userName, string roomName)
+        public async Task<SocketResponseDTO> CreateRoom(string userName, string roomName,string roomTextType)
         {
             UserConnection? user = _stateUsers.GetUser(userName);
             if (user == null)
@@ -60,7 +90,7 @@ namespace keyboard_warrior.Hubs
                 };
             };
 
-            var room = _roomsState.CreateRoom(userName, roomName);
+            var room = _roomsState.CreateRoom(roomName, roomTextType);
 
             if(room == null) return new SocketResponseDTO
             {
@@ -84,11 +114,18 @@ namespace keyboard_warrior.Hubs
             bool IsUserAdd = _roomsState.AddUser(userName, roomId);
             var room = _roomsState.GetRoom(roomId)?.GetRoomDTO();
 
+            if(room?.State == RoomState.Playing.ToString())
+            {
+                return new SocketResponseDTO
+                {
+                    code = 401,
+                    data = room,
+                    message = "You can't in to room when it's playing"
+                };
+            }
+
             if (IsUserAdd && room != null)
             {
-                Console.WriteLine($"{room.Id}, {Context.ConnectionId}");
-                Console.WriteLine(roomId);
-
                 await Groups.AddToGroupAsync(Context.ConnectionId, room.Id);
                 await Clients.GroupExcept(roomId,Context.ConnectionId).SendAsync("hola", room);
                 await Clients.AllExcept(Context.ConnectionId).SendAsync("ChangeUserInRoom", room);
@@ -198,7 +235,9 @@ namespace keyboard_warrior.Hubs
                 IEnumerable<string> usersExcluded = room
                                                     .GetUsers()
                                                     .Select(u => u.ConnectionId);
-            
+
+                RoomTextType roomTypeText = room.GetRoomTextType(); 
+                
                 await Clients
                     .AllExcept(usersExcluded)
                     .SendAsync("StartPlayTimer", room.GetRoomDTO());
@@ -213,7 +252,7 @@ namespace keyboard_warrior.Hubs
              
                 await Clients
                     .Group(roomId)
-                    .SendAsync("StartGame", texts.GetRandomText());
+                    .SendAsync("StartGame", texts.GetRandomText(roomTypeText));
             }
             else
             {
@@ -225,24 +264,25 @@ namespace keyboard_warrior.Hubs
 
         public async void TextTypedPercentage(int percentage,string userName,string roomId )
         {
-            await Clients.Group(roomId).SendAsync("TextTypedPercentage", userName, percentage);
-
+            await Clients.Group(roomId).SendAsync("TextTypedPercentage", userName, percentage)
         }
         public async void FinishGame(string userNameAndTimesStamp, string roomId)
         {
             await Clients.Group(roomId).SendAsync("FinishGame", userNameAndTimesStamp);
         }
-
-/*
-        public string GetPrueba()
+ 
+        public async void RestartRoom(string roomId) 
         {
-            return new String("function prueba(){\n   const hola = 3;\n   const tres = 4;\n   return hola + tres;\n }");
-        }*/
 
-        public string GetPrueba()
-        {
-            return new String("Hola como andas luisina");
+            Room? roomRestarted = _roomsState.RestartRoom(roomId);
+
+            if (roomRestarted != null )
+            {
+                await Clients.Groups(roomId).SendAsync("RestartRoom",roomRestarted.GetRoomDTO());
+                await Clients.AllExcept(roomRestarted.GetUsers().Select(u=> u.ConnectionId)).SendAsync("ChangeUserInRoom",roomRestarted.GetRoomDTO());
+            }
+            
+
         }
-
     }
 }

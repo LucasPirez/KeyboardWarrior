@@ -17,5 +17,7 @@ namespace keyboard_warrior.AppManager
 
         bool RemoveUser(string userName, string roomId);
         string? RemoveUser(string userName);
+
+        Room? RestartRoom(string roomId);
     }
 }
