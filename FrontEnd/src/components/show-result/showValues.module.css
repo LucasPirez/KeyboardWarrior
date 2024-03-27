@@ -1,0 +1,21 @@
+.container {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  font-size: 2rem;
+  margin-right: 25px;
+  font-weight: bold;
+}
+
+.valueName {
+  color: var(--surface-300);
+}
+
+.value {
+  color: var(--teal-600);
+}
+
+.wrongValue {
+  color: var(--red-700);
+}

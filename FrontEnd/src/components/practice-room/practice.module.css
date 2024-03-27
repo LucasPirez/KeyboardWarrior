@@ -1,0 +1,16 @@
+.container {
+  position: relative;
+  width: 90vw;
+  height: auto;
+  margin: auto;
+  margin-bottom: 200px;
+  max-width: 1100px;
+  padding: 30px 0;
+  border-radius: 10px;
+  background: var(--gray-800);
+}
+
+.title {
+  text-align: center;
+  font-size: 3.3rem;
+}

@@ -1,0 +1,1 @@
+export { ShowResult } from './ShowResult';

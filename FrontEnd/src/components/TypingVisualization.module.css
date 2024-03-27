@@ -1,0 +1,81 @@
+.container {
+  max-width: 400px;
+  height: auto;
+  margin: 20px;
+  font-size: 1.7rem;
+  font-weight: 300;
+}
+
+.inputHidden {
+  position: absolute;
+  white-space: unset;
+  scale: 0;
+}
+
+.textTyped {
+  color: var(--gray-900);
+  display: inline;
+}
+
+.textToType {
+  color: var(--gray-500);
+}
+
+.space::before {
+  content: '\23CE';
+  display: inline-block;
+}
+
+.prev {
+  text-wrap: wrap;
+}
+
+.indicator {
+  animation: indicator 1.5s infinite linear;
+}
+
+.indicatorWrong {
+  animation: indicatorWrong 1.5s infinite linear;
+}
+
+@media (max-width: 800px) {
+  .prev {
+    font-size: 1.5rem;
+  }
+}
+
+@keyframes indicator {
+  0% {
+    background: var(--primary-200);
+  }
+  25% {
+    background: var(--primary-400);
+  }
+  50% {
+    background: var(--primary-500);
+  }
+  75% {
+    background: var(--primary-400);
+  }
+  100% {
+    background: var(--primary-200);
+  }
+}
+
+@keyframes indicatorWrong {
+  0% {
+    background: var(--red-200);
+  }
+  25% {
+    background: var(--red-400);
+  }
+  50% {
+    background: var(--red-500);
+  }
+  75% {
+    background: var(--red-400);
+  }
+  100% {
+    background: var(--red-200);
+  }
+}
