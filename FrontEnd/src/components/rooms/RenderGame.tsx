@@ -1,9 +1,10 @@
 import styles from './textContainer.module.css';
-import TextToType from './TextToType';
 import ToggleButtonReady from '../buttons/ToggleButtonReady';
 import { useContextRoom } from './contextRoom';
-import { ROOM_STATES } from '../../constants';
+import { PATH, ROOM_STATES } from '../../constants';
 import Timer from '../Timer';
+import { navigateTo } from '../../helpers';
+import ContainerTyping from './ContainerTypingRoom';
 
 interface Props {
   handleSetPercentage: (value: number) => void;
@@ -12,10 +13,17 @@ interface Props {
 export default function RenderGame({ handleSetPercentage }: Props) {
   const { roomState, room } = useContextRoom();
 
+  if (!room) {
+    navigateTo({
+      path: PATH.rooms,
+    });
+    return;
+  }
+
   const RenderDic = {
     [ROOM_STATES.PLAYING]:
       room && room.text ? (
-        <TextToType
+        <ContainerTyping
           handleSetPercentage={handleSetPercentage}
           room={room}
         />
@@ -23,7 +31,9 @@ export default function RenderGame({ handleSetPercentage }: Props) {
         ''
       ),
     [ROOM_STATES.TIMER]: <Timer />,
-    [ROOM_STATES.WAITING]: <ToggleButtonReady />,
+    [ROOM_STATES.WAITING]: (
+      <ToggleButtonReady service={'toggleReady'} roomId={room?.id} />
+    ),
   };
 
   return (

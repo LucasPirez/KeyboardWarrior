@@ -43,9 +43,11 @@ export default function RoomPage() {
 
       if (id && userName) {
         const result = await serviceGame.joinRoom(id, userName);
-        console.log(result);
 
-        if (result?.data.state === ROOM_STATES.PLAYING) {
+        if (
+          !result?.data ||
+          result?.data.state === ROOM_STATES.PLAYING
+        ) {
           navigateTo({
             path: PATH.rooms,
           });
@@ -58,7 +60,7 @@ export default function RoomPage() {
         }
       }
 
-      await serviceGame.listen('hola', (data) => {
+      await serviceGame.listen(SOCKET_MESSAGES.ROOM_DATA, (data) => {
         handleSetRoom(data as Room);
         handleSetUsers((data as Room).listUser ?? []);
       });
@@ -83,7 +85,7 @@ export default function RoomPage() {
         refIds.current?.id ?? '',
         refIds.current?.userName ?? ''
       );
-      serviceGame.removeListen('hola');
+      serviceGame.removeListen(SOCKET_MESSAGES.ROOM_DATA);
       serviceGame.removeListen(SOCKET_MESSAGES.START_PLAY_TIMER);
       serviceGame.removeListen(SOCKET_MESSAGES.START_GAME);
       serviceGame.removeListen(SOCKET_MESSAGES.RESTART_ROOM);

@@ -1,4 +1,4 @@
-import { CREATE_ROOM_STATE, LANGUAGES } from '@/constants';
+import { CREATE_ROOM_STATE, LANGUAGES } from '../constants';
 
 export interface RoomType {
   [CREATE_ROOM_STATE.ROOM_NAME]: string;

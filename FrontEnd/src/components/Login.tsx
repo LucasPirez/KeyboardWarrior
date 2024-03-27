@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { PATH } from '../constants/paths';
 import styles from './login.module.css';
 import { useLogin } from '../hooks/useLogin';
+import keyboard from '../assets/keyboard-png.jpg';
 
 export default function Login() {
   const [value, setValue] = useState('');
@@ -14,7 +15,6 @@ export default function Login() {
       const result = await login(value);
 
       if (result) {
-        console.log(result);
         window.location.hash = PATH.rooms;
       }
     } catch (error) {
@@ -23,6 +23,7 @@ export default function Login() {
   };
   return (
     <section className={styles.container}>
+      <img src={keyboard} className={styles.img} />
       <div className={styles.subContainer}>
         <InputText
           value={value}

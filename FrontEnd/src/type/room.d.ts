@@ -1,4 +1,4 @@
-import { LANGUAGES } from '@/constants';
+import { LANGUAGES } from '../constants';
 import { RoomStateType, User } from '.';
 
 export interface Room {

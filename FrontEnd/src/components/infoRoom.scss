@@ -3,8 +3,39 @@
   display: flex;
   gap: 30px;
   flex-wrap: wrap;
+  cursor: pointer;
+}
+
+.card:hover .button {
+  animation: animateButton 1.5s infinite;
 }
 
 .p-card-title {
   text-align: center;
+  color: var(--bluegray-200);
+}
+
+.text-descriptors {
+  font-weight: 600;
+  color: var(--gray-300);
+}
+
+.text-descriptors span {
+  font-weight: 400;
+  color: var(--yellow-400);
+}
+
+@keyframes animateButton {
+  0% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
 }

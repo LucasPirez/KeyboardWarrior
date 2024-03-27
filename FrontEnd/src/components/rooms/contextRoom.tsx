@@ -80,7 +80,7 @@ export default function ContextRoomProvider({
 
     (async () => {
       if (isUsersEnd.length === 0) {
-        serviceGame.restartRoom({ roomId: room?.id ?? '' });
+        await serviceGame.restartRoom({ roomId: room?.id ?? '' });
       }
     })();
   }, [usersResult.userEnd]);

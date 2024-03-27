@@ -6,6 +6,8 @@ import Home from './components/Home';
 import Father from './components/rooms/Father';
 import { useLogin } from './hooks/useLogin';
 import { useUser } from './hooks/useUser';
+import { Layout } from './components/Layout';
+import PracticeRoom from './components/practice-room/PracticeRoom';
 
 function App() {
   const [currentPath, setCurrentPath] = useState<
@@ -16,6 +18,8 @@ function App() {
 
   const handleAuth = async () => {
     if (!userName) {
+      console.log('if este no username');
+
       window.location.hash = PATH.login;
       setCurrentPath(PATH.login);
       return;
@@ -24,6 +28,8 @@ function App() {
 
   const handleSplitHash = (hash: string) => {
     if (!hash.includes('#/')) {
+      console.log('if este');
+
       window.location.hash = PATH.login;
       return '/login';
     }
@@ -69,10 +75,17 @@ function App() {
     [PATH.game]: <Father />,
     [PATH.login]: <Login />,
     [PATH.rooms]: <Home />,
+    [PATH.practice]: <PracticeRoom />,
     [PATH.error]: <h1>some error has ocurred</h1>,
   };
 
-  return currentPath ? pageToRender[currentPath] : <h2>leading</h2>;
+  const Component = currentPath ? (
+    pageToRender[currentPath]
+  ) : (
+    <h2>leading</h2>
+  );
+
+  return <Layout>{Component}</Layout>;
 }
 
 export default App;

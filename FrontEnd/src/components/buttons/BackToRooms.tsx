@@ -5,9 +5,10 @@ import { navigateTo } from '../../helpers';
 
 interface Props {
   roomId: string;
+  className?: string;
 }
 
-export function BackToRooms({ roomId }: Props) {
+export function BackToRooms({ roomId, className }: Props) {
   const handleBackToRooms = async () => {
     try {
       const response = await serviceGame.removeUser(
@@ -25,5 +26,11 @@ export function BackToRooms({ roomId }: Props) {
     }
   };
 
-  return <Button label="Back to Rooms" onClick={handleBackToRooms} />;
+  return (
+    <Button
+      label="Back to Rooms"
+      onClick={handleBackToRooms}
+      className={className}
+    />
+  );
 }
