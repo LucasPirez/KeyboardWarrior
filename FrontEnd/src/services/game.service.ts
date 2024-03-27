@@ -2,8 +2,48 @@ import { SOCKET_MESSAGES } from '../constants/socket-messages';
 import { Room, SocketResponse } from '../type';
 import SignalRManager from './SignalRManager.abstract';
 
-interface IGameService {
-  connectGame(): void;
+export interface IGameService {
+  connectGame(): Promise<boolean>;
+  login(userName: string): Promise<boolean>;
+  listen(methodName: string, callback: (data: unknown) => void): void;
+  removeListen(methodName: string): void;
+  createRoom(
+    userName: string,
+    roomName: string,
+    roomTextType: string
+  ): Promise<SocketResponse<Room>>;
+  getRooms(): Promise<SocketResponse<Room[]> | null>;
+  getRoom(id: string): Promise<SocketResponse<Room> | null>;
+  joinRoom(
+    roomId: string,
+    userName: string
+  ): Promise<SocketResponse<Room> | null>;
+  removeUser(roomId: string, userName: string): Promise<boolean>;
+  percentageTyped(
+    percentage: number,
+    userName: string,
+    roomId: string
+  ): Promise<boolean>;
+  toggleReady({
+    userName,
+    roomId,
+    socketMessage,
+  }: {
+    userName: string;
+    roomId: string;
+    socketMessage:
+      | typeof SOCKET_MESSAGES.READY
+      | typeof SOCKET_MESSAGES.NOT_READY;
+  }): Promise<void>;
+  finishGame({
+    userName,
+    roomId,
+  }: {
+    userName: string;
+    roomId: string;
+  }): Promise<void>;
+  restartRoom({ roomId }: { roomId: string }): Promise<void>;
+  getTextPractice(): Promise<void>;
 }
 
 export class GameService
@@ -134,6 +174,10 @@ export class GameService
       | typeof SOCKET_MESSAGES.NOT_READY;
   }): Promise<void> {
     await this.send(socketMessage, userName, roomId);
+  }
+
+  async getTextPractice(): Promise<void> {
+    await this.send(SOCKET_MESSAGES.GET_TEXT_PRACTICE);
   }
 
   async finishGame({
