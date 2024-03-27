@@ -1,0 +1,4 @@
+export enum COLORS_SHOW_VALUES {
+  GOOD_VALUE,
+  BAD_VALUE,
+}

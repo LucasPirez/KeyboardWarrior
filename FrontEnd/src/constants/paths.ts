@@ -2,6 +2,7 @@ export const PATH = {
   login: '/login',
   game: '/game',
   rooms: '/rooms',
+  practice: '/practice',
   error: '/error',
 } as const;
 

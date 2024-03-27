@@ -5,3 +5,6 @@ export { SOCKET_MESSAGES } from './socket-messages';
 export { ROOM_STATES } from './rooms-states';
 export { LANGUAGES } from './languages';
 export { CREATE_ROOM_STATE } from './createRoomState';
+export { DIC_COLORS } from './color-languages';
+export { cpmWpm } from './wpm-cpm';
+export { COLORS_SHOW_VALUES } from './color-show-values';

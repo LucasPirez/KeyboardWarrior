@@ -14,4 +14,6 @@ export const SOCKET_MESSAGES = {
   START_GAME: 'StartGame',
   FINISH_GAME: 'FinishGame',
   RESTART_ROOM: 'RestartRoom',
+  ROOM_DATA: 'RoomData',
+  GET_TEXT_PRACTICE: 'GetPracticeText',
 } as const;
