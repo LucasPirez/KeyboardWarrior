@@ -4,9 +4,6 @@ using keyboard_warrior.enums;
 using keyboard_warrior.Models;
 using keyboard_warrior.Texts;
 using Microsoft.AspNetCore.SignalR;
-using System.Collections;
-using System.Text;
-using System.Text.RegularExpressions;
 
 
 namespace keyboard_warrior.Hubs
@@ -127,7 +124,7 @@ namespace keyboard_warrior.Hubs
             if (IsUserAdd && room != null)
             {
                 await Groups.AddToGroupAsync(Context.ConnectionId, room.Id);
-                await Clients.GroupExcept(roomId,Context.ConnectionId).SendAsync("hola", room);
+                await Clients.GroupExcept(roomId,Context.ConnectionId).SendAsync("RoomData", room);
                 await Clients.AllExcept(Context.ConnectionId).SendAsync("ChangeUserInRoom", room);
 
                 return new SocketResponseDTO
@@ -194,7 +191,7 @@ namespace keyboard_warrior.Hubs
             else
             {
                 await Clients.All.SendAsync("ChangeUserInRoom", room);
-                await Clients.Group(roomId).SendAsync("hola", room);
+                await Clients.Group(roomId).SendAsync("RoomData", room);
             }
 
             return new SocketResponseDTO
@@ -264,7 +261,7 @@ namespace keyboard_warrior.Hubs
 
         public async void TextTypedPercentage(int percentage,string userName,string roomId )
         {
-            await Clients.Group(roomId).SendAsync("TextTypedPercentage", userName, percentage)
+            await Clients.Group(roomId).SendAsync("TextTypedPercentage", userName, percentage);
         }
         public async void FinishGame(string userNameAndTimesStamp, string roomId)
         {
@@ -283,6 +280,13 @@ namespace keyboard_warrior.Hubs
             }
             
 
+        }
+
+        public async void GetPracticeText()
+        {
+            var text = new RandomTexts();
+
+            await Clients.Client(Context.ConnectionId).SendAsync("GetPracticeText", text.GetRandomText(RoomTextType.Javascript));
         }
     }
 }
