@@ -5,15 +5,14 @@ import ContainerTypingPractice from './ContainerTypingPractice';
 import styles from './practice.module.css';
 
 export default function PracticeRoom() {
-  const [percenta, setPercenta] = useState(0);
-  console.log(',hola');
+  const [percentage, setPercentage] = useState(0);
 
   const handleSetPercentage = (value: number) => {
-    setPercenta(value);
+    setPercentage(value);
   };
+
   return (
-    <>
-      <h2 className={styles.title}>Practice</h2>
+    <section className={styles.container}>
       <ProgressBar
         style={{
           height: '30px',
@@ -25,11 +24,11 @@ export default function PracticeRoom() {
             style: { background: 'var(--gray-600)' },
           },
         }}
-        value={percenta}
+        value={percentage}
       />
       <ContainerTypingPractice
         handleSetPercentage={handleSetPercentage}
       />
-    </>
+    </section>
   );
 }
