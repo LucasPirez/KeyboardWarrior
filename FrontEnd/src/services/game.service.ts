@@ -1,5 +1,5 @@
 import { SOCKET_MESSAGES } from '../constants/socket-messages';
-import { Room, SocketResponse } from '../type';
+import { Room, RoomType, SocketResponse } from '../type';
 import SignalRManager from './SignalRManager.abstract';
 
 export interface IGameService {
@@ -43,7 +43,9 @@ export interface IGameService {
     roomId: string;
   }): Promise<void>;
   restartRoom({ roomId }: { roomId: string }): Promise<void>;
-  getTextPractice(): Promise<void>;
+  getTextPractice(
+    roomType: RoomType['RoomType']
+  ): Promise<SocketResponse<string> | null>;
 }
 
 export class GameService
@@ -59,7 +61,6 @@ export class GameService
       SOCKET_MESSAGES.LOGIN,
       userName
     );
-    console.log(userName, data);
 
     return data?.data ?? false;
   }
@@ -176,8 +177,13 @@ export class GameService
     await this.send(socketMessage, userName, roomId);
   }
 
-  async getTextPractice(): Promise<void> {
-    await this.send(SOCKET_MESSAGES.GET_TEXT_PRACTICE);
+  async getTextPractice(
+    roomType: RoomType['RoomType']
+  ): Promise<SocketResponse<string> | null> {
+    return await this.invoke<string>(
+      SOCKET_MESSAGES.GET_TEXT_PRACTICE,
+      roomType
+    );
   }
 
   async finishGame({
