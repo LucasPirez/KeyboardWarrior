@@ -1,5 +1,5 @@
 import { useUser } from '../../hooks/useUser';
-import TypingVisualization from '../TypingVisualization';
+import WritingVisualization from '../WritingVisualization';
 import { useContextRoom } from './contextRoom';
 import { serviceGame } from '../../services';
 import { Room } from '../../type';
@@ -11,11 +11,13 @@ interface Props {
   room: Room & {
     text: string;
   };
+  handleError?: () => void;
 }
 
 export default function ContainerTyping({
   room,
   handleSetPercentage,
+  handleError,
 }: Props) {
   const { id } = room;
   const { userName } = useUser();
@@ -28,6 +30,7 @@ export default function ContainerTyping({
   function handleIntervalPercentage(percentage: number) {
     serviceGame.percentageTyped(percentage, userName ?? '', id ?? '');
   }
+
   function handleFinish() {
     serviceGame.finishGame({
       userName: userName ?? '',
@@ -54,13 +57,16 @@ export default function ContainerTyping({
   }
 
   return (
-    <TypingVisualization
-      handleSetPercentage={setPercentage}
-      textReceived={room.text}
-      finish={handleFinish}
-      inactiveUser={handleInactiveUser}
-      intervalPercentage={handleIntervalPercentage}
-      isInactive={10}
-    />
+    <>
+      <WritingVisualization
+        handleSetPercentage={setPercentage}
+        textReceived={room.text}
+        finish={handleFinish}
+        inactiveUser={handleInactiveUser}
+        intervalPercentage={handleIntervalPercentage}
+        isInactive={10}
+        handleError={handleError}
+      />
+    </>
   );
 }

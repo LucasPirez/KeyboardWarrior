@@ -40,7 +40,6 @@ export default function TablePosition() {
       serviceGame.removeListen(SOCKET_MESSAGES.FINISH_GAME);
     };
   }, [usersResult.positions, room?.listUser]);
-  console.log(usersResult);
 
   const severity: Record<number, 'success' | 'warning' | 'info'> = {
     0: 'success',

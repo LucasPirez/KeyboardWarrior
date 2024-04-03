@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Room } from '../../type';
+import { Room, TimeWriting } from '../../type';
 import { serviceGame } from '../../services';
 import { BackToRooms } from '../buttons';
 import { PATH, ROOM_STATES } from '../../constants';
@@ -17,6 +17,8 @@ export default function RoomPage() {
   const [percentage, setPercentage] = useState(0);
   const { userName } = useUser();
 
+  const refError = useRef(0);
+  const refTimeTyping = useRef<TimeWriting>({ end: 0, start: 0 });
   const refIds = useRef<
     { id: string; userName: string } | undefined
   >();
@@ -93,7 +95,11 @@ export default function RoomPage() {
   }, []);
 
   const handleSetPercentage = (value: number) => {
-    setPercentage(Math.round(value));
+    setPercentage(value);
+  };
+
+  const handleMutableError = () => {
+    refError.current++;
   };
 
   return (
@@ -112,7 +118,12 @@ export default function RoomPage() {
             <div className={styles.listUserContainer}>
               <ListUsers percentageUser={percentage} />
             </div>
-            <RenderGame handleSetPercentage={handleSetPercentage} />
+            <RenderGame
+              handleSetPercentage={handleSetPercentage}
+              refError={refError.current}
+              refTimeTyping={refTimeTyping.current}
+              handleMutableError={handleMutableError}
+            />
           </article>
         </section>
       ) : (
