@@ -4,12 +4,13 @@ import { PATH, SESSION_STORAGE } from '../../constants';
 import { navigateTo } from '../../helpers';
 
 interface Props {
-  roomId: string;
+  roomId?: string;
   className?: string;
 }
 
 export function BackToRooms({ roomId, className }: Props) {
   const handleBackToRooms = async () => {
+    if (!roomId) return navigateTo({ path: PATH.rooms });
     try {
       const response = await serviceGame.removeUser(
         roomId,

@@ -10,10 +10,10 @@ import { navigateTo } from '../../helpers';
 import { InputText } from 'primereact/inputtext';
 import { DropdownChangeEvent } from 'primereact/dropdown';
 import { ChangeEvent, FormEvent, useState } from 'react';
-import { RoomType } from '@/type';
+import { RoomType } from '../../type';
 
 import styles from './createRoom.module.css';
-import DropDown from './drop-down';
+import DropDown from './select-language';
 
 const { ROOM_NAME, ROOM_TYPE } = CREATE_ROOM_STATE;
 
@@ -63,7 +63,10 @@ export default function CreateRoom() {
         onChange={handleChange}
       />
 
-      <DropDown handleChange={handleChange} roomValue={roomValue} />
+      <DropDown
+        handleChange={handleChange}
+        roomValue={roomValue.RoomType}
+      />
 
       <Button
         label="Create Room"

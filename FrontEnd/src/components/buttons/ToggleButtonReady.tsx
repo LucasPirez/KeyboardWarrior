@@ -9,10 +9,7 @@ import { useUser } from '../../hooks/useUser';
 import { IGameService } from '../../services/game.service';
 
 interface Props {
-  service: keyof Pick<
-    IGameService,
-    'toggleReady' | 'getTextPractice'
-  >;
+  service?: keyof Pick<IGameService, 'toggleReady'>;
   roomId: string;
   setStateToggle?: (
     socketMessage:
@@ -41,11 +38,12 @@ export default function ToggleButtonReady({
 
     setStateToggle && setStateToggle(socketMessage);
 
-    await serviceGame[service]({
-      userName: userName ?? '',
-      roomId,
-      socketMessage,
-    });
+    service &&
+      (await serviceGame[service]({
+        userName: userName ?? '',
+        roomId,
+        socketMessage,
+      }));
   };
 
   return (
@@ -53,6 +51,17 @@ export default function ToggleButtonReady({
       onLabel="I Ready"
       offLabel={labelStart ? labelStart : 'I Not Ready'}
       checked={toggleButton}
+      pt={{
+        root: {
+          style: {
+            background: `${
+              toggleButton
+                ? 'var(--highlight-bg)'
+                : 'var(--focus-ring)'
+            }`,
+          },
+        },
+      }}
       onChange={handleToggleState}
     />
   );
