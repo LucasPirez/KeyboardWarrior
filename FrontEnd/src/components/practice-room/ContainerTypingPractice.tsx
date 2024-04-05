@@ -1,4 +1,4 @@
-import { LANGUAGES, SOCKET_MESSAGES } from '../../constants';
+import { SOCKET_MESSAGES } from '../../constants';
 import Timer from '../Timer';
 import ToggleButtonReady from '../buttons/ToggleButtonReady';
 import { useEffect, useRef, useState } from 'react';
@@ -6,13 +6,16 @@ import stylesLocal from './containerTypingPractice.module.css';
 import WritingVisualization from '../WritingVisualization';
 import { serviceGame } from '../../services';
 import { ShowResult } from '../show-result';
+import { RoomType } from '../../type';
 
 interface Props {
   handleSetPercentage: (percentage: number) => void;
+  roomType: RoomType['RoomType'];
 }
 
 export default function ContainerTypingPractice({
   handleSetPercentage,
+  roomType,
 }: Props) {
   const [text, setText] = useState<string | null>(null);
   const [roomState, setRoomState] = useState<
@@ -39,14 +42,17 @@ export default function ContainerTypingPractice({
   };
 
   useEffect(() => {
-    serviceGame.listen(SOCKET_MESSAGES.GET_TEXT_PRACTICE, (data) => {
-      setText(data as string);
-      handleSetPercentage(0);
-    });
+    (async () => {
+      const response = await serviceGame.getTextPractice(roomType);
 
-    return () => {
-      serviceGame.removeListen(SOCKET_MESSAGES.GET_TEXT_PRACTICE);
-    };
+      if (!response?.data)
+        throw new Error(
+          'some error has ocurred, in receive text practice room'
+        );
+
+      setText(response?.data);
+      handleSetPercentage(0);
+    })();
   }, []);
 
   const setPercentage = (percentage: number) => {
@@ -61,7 +67,6 @@ export default function ContainerTypingPractice({
 
   const buttonComponent = (
     <ToggleButtonReady
-      service={'getTextPractice'}
       roomId="practice"
       setStateToggle={setRoomState}
       labelStart="Start"
@@ -87,7 +92,7 @@ export default function ContainerTypingPractice({
           <ShowResult
             text={text ?? ''}
             errors={refErrors.current}
-            language={LANGUAGES.NORMAL_TEXT}
+            language={roomType}
             timeMilliseconds={
               refTimeWriting.current.end -
               refTimeWriting.current.start

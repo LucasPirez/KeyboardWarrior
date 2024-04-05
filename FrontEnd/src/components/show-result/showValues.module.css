@@ -9,13 +9,14 @@
 }
 
 .valueName {
-  color: var(--surface-300);
+  color: var(--surface-500);
 }
 
 .value {
-  color: var(--teal-600);
+  color: var(--teal-500);
+  opacity: 0.8;
 }
 
 .wrongValue {
-  color: var(--red-700);
+  color: var(--pink-500);
 }
