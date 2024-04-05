@@ -3,6 +3,7 @@ using keyboard_warrior.DTOs;
 using keyboard_warrior.enums;
 using keyboard_warrior.Models;
 using keyboard_warrior.Texts;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.SignalR;
 
 
@@ -282,11 +283,32 @@ namespace keyboard_warrior.Hubs
 
         }
 
-        public async void GetPracticeText()
+        public SocketResponseDTO GetPracticeText(string roomTextType)
         {
             var text = new RandomTexts();
 
-            await Clients.Client(Context.ConnectionId).SendAsync("GetPracticeText", text.GetRandomText(RoomTextType.Javascript));
+            RoomTextType textType;
+            if(Enum.TryParse(roomTextType,true,   out textType))
+            {
+
+                return new SocketResponseDTO
+                {
+
+                    code = 200,
+                    data = text.GetRandomText(textType),
+                    message = "Ok",
+                };
+            }
+            else
+            {
+                return new SocketResponseDTO
+                {
+
+                    code = 500,
+                    data = "",
+                    message = "false",
+                };
+            }
         }
     }
 }
