@@ -4,3 +4,4 @@ export { type SocketResponse } from './socket-response';
 export { type RoomStateType } from './room-states';
 export { type FinishGameData } from './finish-game';
 export { type RoomType } from './roomType';
+export { type TimeWriting } from './time-typing';

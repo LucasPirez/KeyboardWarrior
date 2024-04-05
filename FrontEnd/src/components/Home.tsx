@@ -1,5 +1,6 @@
 import CreateRoom from './create-room/CreateRoom';
 import Room from './InfoRoom';
+import SelectPractice from './SelectPractice';
 
 export default function Home() {
   return (
@@ -11,7 +12,16 @@ export default function Home() {
         justifyContent: 'center',
         width: '100vw',
       }}>
-      <CreateRoom />
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'start',
+          justifyContent: 'center',
+          gap: 70,
+        }}>
+        <CreateRoom />
+        <SelectPractice />
+      </div>
       <Room />
     </div>
   );

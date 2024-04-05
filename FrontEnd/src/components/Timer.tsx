@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
+import styles from './timer.module.css';
 
 interface Props {
   finish?: () => void;
 }
 
 export default function Timer({ finish }: Props) {
-  const [timer, setTimer] = useState(5);
+  const [timer, setTimer] = useState(3);
 
   useEffect(() => {
     const inter = setInterval(() => {
@@ -24,7 +25,7 @@ export default function Timer({ finish }: Props) {
 
   return (
     <div>
-      <span>{timer}</span>
+      <span className={styles.timer}>{timer}</span>
     </div>
   );
 }
