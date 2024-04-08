@@ -3,13 +3,13 @@ using System.Collections.Concurrent;
 
 namespace keyboard_warrior.AppManager
 {
-    public class UsersSingleton : IUsersSingleton
+    public class UsersRepositorie : IUsersRepositorie
     {
 
         private ConcurrentDictionary<string, UserConnection> connectedUsers = new ConcurrentDictionary<string, UserConnection>();
 
 
-        public void AddUser(string username,string connectionId)
+        public async  Task AddUser(string username,string connectionId)
         {
             string guid = Guid.NewGuid().ToString();
 
@@ -18,7 +18,7 @@ namespace keyboard_warrior.AppManager
             connectedUsers.TryAdd(username, newUser);
         }
 
-        public string See()
+        public async Task<string> See()
         {
             string h = "";
 
@@ -30,17 +30,17 @@ namespace keyboard_warrior.AppManager
             return h;
         }
 
-        public void RemoveUser(string username)
+        public async Task RemoveUser(string username)
         {
             connectedUsers.TryRemove(username, out _);
         }
 
-        public bool IsUserExist(string username)
+        public async Task<bool> IsUserExist(string username)
         {
             return connectedUsers.ContainsKey(username);
         }
 
-        public UserConnection? GetUser(string username)
+        public async Task<UserConnection?> GetUser(string username)
         { 
             if (connectedUsers.TryGetValue(username, out UserConnection user))
             {
@@ -52,7 +52,7 @@ namespace keyboard_warrior.AppManager
             }
         }
 
-        public UserConnection? GetUserByConnectionId(string connectionId)
+        public async Task<UserConnection?> GetUserByConnectionId(string connectionId)
         {
           return connectedUsers.Values.FirstOrDefault(u => u.ConnectionId == connectionId);
         }
