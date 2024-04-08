@@ -1,18 +1,18 @@
 ﻿using keyboard_warrior.AppManager;
 using keyboard_warrior.DTOs;
-using keyboard_warrior.enums;
-using keyboard_warrior.Models;
-using keyboard_warrior.Texts;
-using Microsoft.AspNetCore.Http.HttpResults;
+using keyboard_warrior.Exceptions;
+using keyboard_warrior.Services;
 using Microsoft.AspNetCore.SignalR;
+using System.Net;
 
 
 namespace keyboard_warrior.Hubs
 {
-    public class GameHub(IUsersSingleton stateUsers, IRoomsSingleton roomsState) : Hub
+    public class GameHub(IGameHubServices gameHubServices,
+                            ILogger<GameHub> logger) : Hub
     {
-        private IUsersSingleton _stateUsers = stateUsers;
-        private IRoomsSingleton _roomsState = roomsState;
+        private IGameHubServices _gameHubServices = gameHubServices;
+        private ILogger<GameHub> _logger = logger;
 
         public override async Task OnConnectedAsync()
         {
@@ -23,218 +23,190 @@ namespace keyboard_warrior.Hubs
 
         public override async Task OnDisconnectedAsync(Exception exception)
         {
-
-            var user = _stateUsers.GetUserByConnectionId(Context.ConnectionId);
-
-            if (user != null)
+            try
             {
-
-             string? roomId = _roomsState.RemoveUser(user.UserName);
-                
-                _stateUsers.RemoveUser(user.UserName);
-
-                if(roomId != null)
+                var (roomDTO,deleted) = await _gameHubServices.OnDisconected(Context.ConnectionId);
+              
+                if (roomDTO != null)
                 {
-                var room = _roomsState.GetRoom(roomId)?.GetRoomDTO();
-                await Groups.RemoveFromGroupAsync(Context.ConnectionId, roomId);
-                if (room == null)
+                if (!deleted)
                 {
-                    await Clients.All.SendAsync("DeleteRoom", roomId);
+                    await Groups.RemoveFromGroupAsync(Context.ConnectionId, roomDTO.Id);
+                    await Clients.All.SendAsync("ChangeUserInRoom", roomDTO);
+                    await Clients.Group(roomDTO.Id).SendAsync("hola", roomDTO);
                 }
                 else
                 {
-                    await Clients.All.SendAsync("ChangeUserInRoom", room);
-                    await Clients.Group(roomId).SendAsync("hola", room);
+                    await Clients.All.SendAsync("DeleteRoom", roomDTO.Id);
                 }
                 }
-
-            }
-
+                
             await base.OnDisconnectedAsync(exception);
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+            }
+            
         }
 
-        public SocketResponseDTO Login(string userName)
+        public async Task<SocketResponseDTO<bool>> Login(string userName)
         {
-            if (_stateUsers.IsUserExist(userName))
+            SocketResponseDTO<bool> response = new();
+            try
             {
-                return new SocketResponseDTO()
-                {
-                    code = 400,
-                    message = "User already exist",
-                    data = false
-                };
+
+            if (await _gameHubServices.Login(userName, Context.ConnectionId))
+            {  
+             return response.Send((int)HttpStatusCode.Conflict,"User already exist", false ); 
             }
 
-            _stateUsers.AddUser(userName, Context.ConnectionId);
-
-            return new SocketResponseDTO()
+                return response.Send((int)HttpStatusCode.OK, "User Created", true);
+            }     
+            catch (Exception e)
             {
-                code = 200,
-                message = "User Created",
-                data = true
-
-            };
-        }
-
-        public async Task<SocketResponseDTO> CreateRoom(string userName, string roomName,string roomTextType)
-        {
-            UserConnection? user = _stateUsers.GetUser(userName);
-            if (user == null)
-            {
-                return new SocketResponseDTO
-                {
-                    code = 404,
-                    message = "User doesn't exist please Login again",
-                };
-            };
-
-            var room = _roomsState.CreateRoom(roomName, roomTextType);
-
-            if(room == null) return new SocketResponseDTO
-            {
-                code = 500,
-                message = "Some error has ocurred",
-            };
-           
-            await Groups.AddToGroupAsync(Context.ConnectionId, room.Id);
-            await Clients.All.SendAsync("CreateRoom", room);
-
-            return new SocketResponseDTO
-            {
-
-                message = "Room Created",
-                data = room
-            };
-        }
-
-        public async Task<SocketResponseDTO> JoinRoom(string roomId, string userName)
-        { 
-            bool IsUserAdd = _roomsState.AddUser(userName, roomId);
-            var room = _roomsState.GetRoom(roomId)?.GetRoomDTO();
-
-            if(room?.State == RoomState.Playing.ToString())
-            {
-                return new SocketResponseDTO
-                {
-                    code = 401,
-                    data = room,
-                    message = "You can't in to room when it's playing"
-                };
-            }
-
-            if (IsUserAdd && room != null)
-            {
-                await Groups.AddToGroupAsync(Context.ConnectionId, room.Id);
-                await Clients.GroupExcept(roomId,Context.ConnectionId).SendAsync("RoomData", room);
-                await Clients.AllExcept(Context.ConnectionId).SendAsync("ChangeUserInRoom", room);
-
-                return new SocketResponseDTO
-                {
-                    code = 200,
-                    data = room,
-                    message = "User add with exist"
-                };
-            }
-            else
-            {
-                return new SocketResponseDTO
-                {
-                    code = 500,
-                    data = false,
-                    message = "Some error has ocurred"
-                };
+                _logger.LogError(e, e.Message);
+                return response.Send((int)HttpStatusCode.InternalServerError, e.Message, false);
             }
         }
 
-        public SocketResponseDTO GetRooms()
+        public async Task<SocketResponseDTO<RoomDTO?>> CreateRoom(string userName, string roomName,string roomTextType)
         {
-            return new SocketResponseDTO
-            {
-                code = 200,
-                message = "ok",
-                data = _roomsState.GetRooms()
+            SocketResponseDTO<RoomDTO?> response = new();
 
-            };
+            try
+            {
+                RoomDTO? roomDTO = await _gameHubServices.CreateRoom(userName,roomName,roomTextType);
+         
+                await Groups.AddToGroupAsync(Context.ConnectionId, roomDTO.Id);
+                await Clients.All.SendAsync("CreateRoom", roomDTO);
+
+                return response.Send((int)HttpStatusCode.OK, "Room Created", roomDTO);
+            }
+            catch (MyException e)
+            {
+                _logger.LogError(e, e.Message);
+                return response.Send(e.ErrorCode, e.Message,null);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, e.Message);
+                return response.Send((int)HttpStatusCode.InternalServerError, e.Message,null);
+            }
         }
 
-        public SocketResponseDTO GetRoom(string id)
+        public async Task<SocketResponseDTO<RoomDTO?>> JoinRoom(string roomId, string userName)
         {
-            return new SocketResponseDTO
+            try
             {
-                code = 200,
-                message = "ok",
-                data = _roomsState.GetRoom(id)?.GetRoomDTO() 
-            };
-        }
+                var service = await _gameHubServices.JoinRoom(roomId, userName);
 
-
-        public async Task<SocketResponseDTO> RemoveUserRoom(string roomId, string userName)
-        {
-            if (!_roomsState.RemoveUser(userName,roomId))
-            {
-                return new SocketResponseDTO
+                if (service.Code == (int)HttpStatusCode.OK && service.Data != null)
                 {
-                    code = 401,
-                    data = false,
-                    message = "User or Room doesn't exist"
-                };
+                    await Groups.AddToGroupAsync(Context.ConnectionId, service.Data.Id);
+                    await Clients.GroupExcept(roomId, Context.ConnectionId).SendAsync("RoomData", service.Data);
+                    await Clients.AllExcept(Context.ConnectionId).SendAsync("ChangeUserInRoom", service.Data);
+                }
+                return service;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, e.Message);
+                return new SocketResponseDTO<RoomDTO?>((int)HttpStatusCode.InternalServerError, e.Message,null);
+            }
+        }
+
+        public async Task<SocketResponseDTO<IEnumerable<RoomDTO>?>> GetRooms()
+        {
+            try
+            {
+            var service = await _gameHubServices.GetRooms();
+            return new SocketResponseDTO<IEnumerable<RoomDTO>?>((int)HttpStatusCode.OK, "Ok", service);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, e.Message);
+                return new SocketResponseDTO<IEnumerable<RoomDTO>?>((int)HttpStatusCode.InternalServerError, e.Message, null);
+            }
+        }
+
+        public async Task<SocketResponseDTO<RoomDTO?>> GetRoom(string id)
+        {
+            try
+            {
+
+            var service = await _gameHubServices.GetRoom(id);
+            return new SocketResponseDTO<RoomDTO?>((int)HttpStatusCode.OK, "Ok", service);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, e.Message);
+                return new SocketResponseDTO<RoomDTO?>((int)HttpStatusCode.InternalServerError, e.Message, null);
             }
 
-            var room = _roomsState.GetRoom(roomId)?.GetRoomDTO();
+        }
+
+
+        public async Task<SocketResponseDTO<bool>> RemoveUserRoom(string roomId, string userName)
+        {
+            try
+            {
+
+                var roomDTO = await _gameHubServices.RemoveUserRoom(roomId, userName);
 
                 await Groups.RemoveFromGroupAsync(Context.ConnectionId, roomId);
 
+                if (roomDTO == null)
+                {
+                    await Clients.All.SendAsync("DeleteRoom", roomId);
+                    return  new SocketResponseDTO<bool>((int)HttpStatusCode.OK, "user removed", true);
+                }
 
-            if (room == null)
-            {
-                await Clients.All.SendAsync("DeleteRoom", roomId);
-            }
-            else
-            {
-                await Clients.All.SendAsync("ChangeUserInRoom", room);
-                await Clients.Group(roomId).SendAsync("RoomData", room);
-            }
+                await Clients.All.SendAsync("ChangeUserInRoom", roomDTO);
+                await Clients.Group(roomId).SendAsync("RoomData", roomDTO);
 
-            return new SocketResponseDTO
+                return new SocketResponseDTO<bool>((int)HttpStatusCode.OK, "user removed", true);
+
+            }
+            catch(MyException e)
             {
-                code = 200,
-                data = true,
-                message = "User removed"
-            };
+                _logger.LogError(e, e.Message);
+                return new SocketResponseDTO<bool>(e.ErrorCode, e.Message, false);
+
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, e.Message);
+                return new SocketResponseDTO<bool>((int)HttpStatusCode.InternalServerError, e.Message, false);
+            }
 
         }
 
 
-        public async void NotReady(string userName, string roomId)
-        { 
-            var room = _roomsState.GetRoom(roomId);
-
-            if (room == null) return;
-
-            room.UpdateStateUser(false, userName);
-
+        public async Task NotReady(string userName, string roomId)
+        {
+            try
+            {
+            await _gameHubServices.NotReady(userName,roomId);
             await Clients.Group(roomId).SendAsync("ChangeStateUser", userName, false);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+            }
         }
 
         public async Task Ready(string userName, string roomId)
         {
-            var room = _roomsState.GetRoom(roomId);
-
-            if (room == null) return;
-
-            room.UpdateStateUser(true, userName);
-
-            int usersCount = room.GetUsers().Count;
-            int userNotReady = room.GetUsers().Where(u => u.Ready == false).Count();
-            if(userNotReady == 0 && usersCount > 1)
+            try
             {
-                room.SetRoomState(RoomState.Playing);
-
+                var (room, text) = await _gameHubServices.Ready(userName, roomId);
+                
+            if(text != null)
+            {
                 IEnumerable<string> usersExcluded = room
                                                     .GetUsers()
                                                     .Select(u => u.ConnectionId);
-
-                RoomTextType roomTypeText = room.GetRoomTextType(); 
                 
                 await Clients
                     .AllExcept(usersExcluded)
@@ -243,20 +215,26 @@ namespace keyboard_warrior.Hubs
                     .Group(roomId)
                     .SendAsync("StartPlayTimer");
 
-                await Task.Delay(5000);
+                await Task.Delay(3000);
 
-                var texts = new RandomTexts();
-
-             
                 await Clients
                     .Group(roomId)
-                    .SendAsync("StartGame", texts.GetRandomText(roomTypeText));
+                    .SendAsync("StartGame", text);
             }
             else
             {
                 await Clients
                     .Group(roomId)
                     .SendAsync("ChangeStateUser",userName,true);
+            }
+            }
+            catch(MyException ex)
+            {
+                _logger.LogError(ex, ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
             }
         }
 
@@ -269,45 +247,46 @@ namespace keyboard_warrior.Hubs
             await Clients.Group(roomId).SendAsync("FinishGame", userNameAndTimesStamp);
         }
  
-        public async void RestartRoom(string roomId) 
+        public async Task RestartRoom(string roomId) 
         {
-
-            Room? roomRestarted = _roomsState.RestartRoom(roomId);
-
-            if (roomRestarted != null )
+            try
             {
-                await Clients.Groups(roomId).SendAsync("RestartRoom",roomRestarted.GetRoomDTO());
-                await Clients.AllExcept(roomRestarted.GetUsers().Select(u=> u.ConnectionId)).SendAsync("ChangeUserInRoom",roomRestarted.GetRoomDTO());
+
+            Room roomRestarted = await _gameHubServices.RestartRoom(roomId);
+
+                await Clients.Groups(roomId)
+                             .SendAsync("RestartRoom",roomRestarted.GetRoomDTO());
+                await Clients.AllExcept(roomRestarted.GetUsers().Select(u=> u.ConnectionId))
+                             .SendAsync("ChangeUserInRoom",roomRestarted.GetRoomDTO());
+            }   
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
             }
             
 
         }
 
-        public SocketResponseDTO GetPracticeText(string roomTextType)
+        public async Task<SocketResponseDTO<string?>> GetPracticeText(string roomTextType)
         {
-            var text = new RandomTexts();
+            SocketResponseDTO<string?> response = new();
 
-            RoomTextType textType;
-            if(Enum.TryParse(roomTextType,true,   out textType))
+            try
             {
+            var text = await _gameHubServices.GetPracticeText(roomTextType);
 
-                return new SocketResponseDTO
-                {
+            return    response.Send((int)HttpStatusCode.OK, "Text receive", text);
 
-                    code = 200,
-                    data = text.GetRandomText(textType),
-                    message = "Ok",
-                };
             }
-            else
+            catch(MyException ex)
             {
-                return new SocketResponseDTO
-                {
-
-                    code = 500,
-                    data = "",
-                    message = "false",
-                };
+                _logger.LogError(ex, ex.Message);
+                return response.Send(ex.ErrorCode, ex.Message, null);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return response.Send((int)HttpStatusCode.InternalServerError, ex.Message, null);
             }
         }
     }
