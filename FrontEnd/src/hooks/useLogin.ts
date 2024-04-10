@@ -9,7 +9,6 @@ export const useLogin = (): {
       const socketResponse = await serviceGame.login(userName);
 
       if (!socketResponse) {
-        alert('The userName is already exist');
         return false;
       }
       window.sessionStorage.setItem(SESSION_STORAGE, userName);

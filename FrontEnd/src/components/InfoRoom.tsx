@@ -8,11 +8,23 @@ import './infoRoom.scss';
 import JoinRoom from './rooms/JoinRoom';
 import { DIC_COLORS, ROOM_STATES } from '../constants';
 import { replaceObjectInArray } from '../helpers/replaceObjectInArray.helper';
+import { useLogin } from '../hooks/useLogin';
+import { useUser } from '../hooks/useUser';
+import { navigateTo } from '../helpers';
 
 export default function Room() {
   const [rooms, setRooms] = useState<RoomType[]>([]);
+  const { login } = useLogin();
+  const { userName } = useUser();
 
   useEffect(() => {
+    if (!userName) {
+      navigateTo({
+        path: '/login',
+      });
+      return;
+    }
+    login(userName);
     (async () => {
       const getRooms = await serviceGame.getRooms();
       setRooms(getRooms?.data ?? []);
@@ -80,56 +92,55 @@ export default function Room() {
 
   return (
     <section className="container">
-      {rooms &&
-        [...rooms].map((room) => (
-          <Card
-            key={Math.random()}
-            style={{
-              background: `${
-                room.state === ROOM_STATES.PLAYING
-                  ? 'var(--text-color-secondary)'
-                  : ''
-              }`,
-            }}
-            title={room.name}
-            className="card">
-            <p className="text-descriptors">
-              Text:{' '}
-              <span
-                style={{
-                  color: DIC_COLORS[room.roomType],
-                }}>
-                {' '}
-                {room.roomType}
-              </span>
-            </p>
-            <p className="text-descriptors">
-              State:{' '}
-              <span
-                style={{
-                  color: DIC_COLORS[room.roomType],
-                }}>
-                {room.state}
-              </span>
-            </p>
-            <p className="text-descriptors">
-              Players:{' '}
-              <span
-                style={{
-                  color: DIC_COLORS[room.roomType],
-                }}>
-                {' '}
-                {room.listUser.length}
-              </span>
-            </p>
-            <div className="button">
-              <JoinRoom
-                roomId={room.id}
-                disabled={room.state === ROOM_STATES.PLAYING}
-              />
-            </div>
-          </Card>
-        ))}
+      {rooms?.map((room) => (
+        <Card
+          key={Math.random()}
+          style={{
+            background: `${
+              room.state === ROOM_STATES.PLAYING
+                ? 'var(--text-color-secondary)'
+                : ''
+            }`,
+          }}
+          title={room.name}
+          className="card">
+          <p className="text-descriptors">
+            Text:{' '}
+            <span
+              style={{
+                color: DIC_COLORS[room.roomType],
+              }}>
+              {' '}
+              {room.roomType}
+            </span>
+          </p>
+          <p className="text-descriptors">
+            State:{' '}
+            <span
+              style={{
+                color: DIC_COLORS[room.roomType],
+              }}>
+              {room.state}
+            </span>
+          </p>
+          <p className="text-descriptors">
+            Players:{' '}
+            <span
+              style={{
+                color: DIC_COLORS[room.roomType],
+              }}>
+              {' '}
+              {room.listUser.length}
+            </span>
+          </p>
+          <div className="button">
+            <JoinRoom
+              roomId={room.id}
+              disabled={room.state === ROOM_STATES.PLAYING}
+            />
+          </div>
+        </Card>
+      ))}
     </section>
   );
 }
