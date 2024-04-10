@@ -34,7 +34,12 @@ export default function ListUsers({ percentageUser }: Props) {
   return (
     <article style={{ background: '' }}>
       {users.map((user, index) => (
-        <div key={user?.id}>
+        <div
+          key={user?.id}
+          style={{
+            minWidth: '200px',
+            maxWidth: '400px',
+          }}>
           <p
             style={{
               color: `${
@@ -54,8 +59,6 @@ export default function ListUsers({ percentageUser }: Props) {
           <ProgressBar
             style={{
               height: '30px',
-              minWidth: '200px',
-              width: '400px',
             }}
             pt={{
               root: {
