@@ -1,23 +1,28 @@
 using keyboard_warrior.AppManager;
 using keyboard_warrior.Hubs;
+using keyboard_warrior.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddLogging();
 builder.Services.AddSignalR();
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy",
-        builder => builder.WithOrigins("http://localhost:5173")
+        builder => builder.WithOrigins("http://192.168.0.14:5173", "http://localhost:5173")
         .AllowAnyMethod()
         .AllowAnyHeader()
         .AllowCredentials());
 });
 
-builder.Services.AddSingleton<IRoomsSingleton, RoomsSingleton>();
-builder.Services.AddSingleton<IUsersSingleton, UsersSingleton>();
+builder.Services.AddSingleton<IRoomsRepositorie, RoomsRepositorie>();
+builder.Services.AddSingleton<IUsersRepositorie, UsersRepositorie>();
+
+builder.Services.AddScoped<IGameHubServices, GameHubServices>();
+
 
 var app = builder.Build();
 
@@ -43,6 +48,5 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.MapHub<GameHub>("/Play");
-app.MapHub<RoomHub>("/room");
 
 app.Run();
