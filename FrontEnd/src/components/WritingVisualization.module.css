@@ -2,7 +2,6 @@
   width: auto;
   height: auto;
   margin: auto;
-  font-size: 1.7rem;
   font-weight: 300;
 }
 
@@ -21,14 +20,26 @@
   color: var(--gray-500);
 }
 
-.space::before {
+.space::before,
+.spaceWrong::before {
+  position: absolute;
   content: '\23CE';
   display: inline-block;
   font-weight: bold;
 }
 
+.space::before {
+  animation: indicator 1.5s infinite linear;
+}
+
+.spaceWrong::before {
+  animation: indicatorWrong 1.5s infinite linear;
+}
 .prev {
   text-wrap: wrap;
+  padding: 13px;
+  font-size: 1.8em;
+  line-height: 1.7;
 }
 
 .indicator {
@@ -39,27 +50,33 @@
   animation: indicatorWrong 1.5s infinite linear;
 }
 
+@media (max-width: 1150px) {
+  .prev {
+    line-height: 1.7;
+  }
+}
+
 @media (max-width: 800px) {
   .prev {
-    font-size: 1.5rem;
+    font-size: 1.5em;
   }
 }
 
 @keyframes indicator {
   0% {
-    background: var(--primary-200);
+    background-color: var(--primary-200);
   }
   25% {
-    background: var(--primary-400);
+    background-color: var(--primary-500);
   }
   50% {
-    background: var(--primary-500);
+    background-color: var(--primary-700);
   }
   75% {
-    background: var(--primary-400);
+    background-color: var(--primary-500);
   }
   100% {
-    background: var(--primary-200);
+    background-color: var(--primary-200);
   }
 }
 

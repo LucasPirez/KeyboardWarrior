@@ -164,11 +164,15 @@ export default function WritingVisualization({
                   {text.charTyped}
                 </span>
                 <span
-                  className={`
+                  className={` ${styles.indicator}
                 ${wrongLetter ? styles.indicatorWrong : ''}
-                ${text.charToType === '\n' ? styles.space : ''} ${
-                    styles.indicator
-                  }`}>
+                ${
+                  text.charToType === '\n'
+                    ? !wrongLetter
+                      ? styles.space
+                      : styles.spaceWrong
+                    : ''
+                } `}>
                   {text.charToType}
                 </span>
                 <span className={styles.textToType}>
