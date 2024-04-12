@@ -12,14 +12,14 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy",
-        builder => builder.WithOrigins("http://192.168.0.14:5173", "http://localhost:5173")
+        builder => builder.WithOrigins(["http://192.168.0.14", "http://localhost"])
         .AllowAnyMethod()
         .AllowAnyHeader()
         .AllowCredentials());
 });
 
-builder.Services.AddSingleton<IRoomsRepositorie, RoomsRepositorie>();
-builder.Services.AddSingleton<IUsersRepositorie, UsersRepositorie>();
+builder.Services.AddSingleton<IRoomsRepository, RoomsRepository>();
+builder.Services.AddSingleton<IUsersRepository, UsersRepository>();
 
 builder.Services.AddScoped<IGameHubServices, GameHubServices>();
 
@@ -35,7 +35,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();
+
 
 app.UseRouting();
 

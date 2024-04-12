@@ -8,8 +8,7 @@ using System.Net;
 
 namespace keyboard_warrior.Hubs
 {
-    public class GameHub(IGameHubServices gameHubServices,
-                            ILogger<GameHub> logger) : Hub
+    public class GameHub(IGameHubServices gameHubServices,ILogger<GameHub> logger) : Hub
     {
         private IGameHubServices _gameHubServices = gameHubServices;
         private ILogger<GameHub> _logger = logger;

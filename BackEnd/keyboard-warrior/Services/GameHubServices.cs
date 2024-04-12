@@ -8,11 +8,11 @@ using System.Net;
 
 namespace keyboard_warrior.Services
 {
-    public class GameHubServices(IUsersRepositorie stateUsers,
-        IRoomsRepositorie roomsState) : IGameHubServices 
+    public class GameHubServices(IUsersRepository stateUsers,
+        IRoomsRepository roomsState) : IGameHubServices 
     {
-        private IUsersRepositorie _stateUsers = stateUsers;
-        private IRoomsRepositorie _roomsState = roomsState;
+        private IUsersRepository _stateUsers = stateUsers;
+        private IRoomsRepository _roomsState = roomsState;
       
         public async Task<(RoomDTO?,bool)> OnDisconected(string connectionId)
         {
