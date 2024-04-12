@@ -3,7 +3,7 @@ using keyboard_warrior.Models;
 
 namespace keyboard_warrior.AppManager
 {
-    public interface IRoomsRepositorie
+    public interface IRoomsRepository
     {
         Task<IEnumerable<RoomDTO>> GetRooms();
 

@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 
 namespace keyboard_warrior.AppManager
 {
-    public class UsersRepositorie : IUsersRepositorie
+    public class UsersRepository : IUsersRepository
     {
 
         private ConcurrentDictionary<string, UserConnection> connectedUsers = new ConcurrentDictionary<string, UserConnection>();

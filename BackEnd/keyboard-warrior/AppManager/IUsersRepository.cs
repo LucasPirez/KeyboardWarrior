@@ -2,7 +2,7 @@
 
 namespace keyboard_warrior.AppManager
 {
-    public interface IUsersRepositorie
+    public interface IUsersRepository
     {
 
         Task RemoveUser(string username);
