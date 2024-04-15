@@ -99,7 +99,7 @@ export default function WritingVisualization({
       }
     } else {
       setWrongLetter(true);
-      handleError && handleError();
+      handleError?.();
     }
   };
 
@@ -112,7 +112,7 @@ export default function WritingVisualization({
         if (refPercentage?.current.value === 100) {
           clearInterval(refInterval.current.value);
 
-          finish && finish();
+          finish?.();
         }
 
         if (
@@ -133,7 +133,7 @@ export default function WritingVisualization({
           (async () => {
             try {
               // handleSetUserEnd(userName ?? '');
-              inactiveUser && (await inactiveUser());
+              await inactiveUser?.();
             } catch (error) {
               alert(error);
             }
