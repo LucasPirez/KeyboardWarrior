@@ -1,5 +1,6 @@
 ﻿using keyboard_warrior.AppManager;
 using keyboard_warrior.DTOs;
+using keyboard_warrior.enums;
 using keyboard_warrior.Exceptions;
 using keyboard_warrior.Services;
 using Microsoft.AspNetCore.SignalR;
@@ -24,15 +25,21 @@ namespace keyboard_warrior.Hubs
         {
             try
             {
-                var (roomDTO,deleted) = await _gameHubServices.OnDisconected(Context.ConnectionId);
-              
-                if (roomDTO != null)
+                var (room,deleted) = await _gameHubServices.OnDisconected(Context.ConnectionId);
+
+                if (room != null)
                 {
+                var roomDTO = room.GetRoomDTO();
                 if (!deleted)
                 {
                     await Groups.RemoveFromGroupAsync(Context.ConnectionId, roomDTO.Id);
                     await Clients.All.SendAsync("ChangeUserInRoom", roomDTO);
-                    await Clients.Group(roomDTO.Id).SendAsync("hola", roomDTO);
+                    await Clients.Group(roomDTO.Id).SendAsync("RoomData", roomDTO);
+
+                    if(await _gameHubServices.theGameStarts(room))
+                        {
+                            await StartGame(room);
+                        }
                 }
                 else
                 {
@@ -150,19 +157,23 @@ namespace keyboard_warrior.Hubs
         {
             try
             {
-
-                var roomDTO = await _gameHubServices.RemoveUserRoom(roomId, userName);
+                var room = await _gameHubServices.RemoveUserRoom(roomId, userName);
 
                 await Groups.RemoveFromGroupAsync(Context.ConnectionId, roomId);
 
-                if (roomDTO == null)
+                if (room == null)
                 {
                     await Clients.All.SendAsync("DeleteRoom", roomId);
                     return  new SocketResponseDTO<bool>((int)HttpStatusCode.OK, "user removed", true);
                 }
 
-                await Clients.All.SendAsync("ChangeUserInRoom", roomDTO);
-                await Clients.Group(roomId).SendAsync("RoomData", roomDTO);
+                await Clients.All.SendAsync("ChangeUserInRoom", room.GetRoomDTO());
+                await Clients.Group(roomId).SendAsync("RoomData", room.GetRoomDTO());
+
+                if (await _gameHubServices.theGameStarts(room))
+                {
+                    await StartGame(room);
+                }
 
                 return new SocketResponseDTO<bool>((int)HttpStatusCode.OK, "user removed", true);
 
@@ -203,22 +214,7 @@ namespace keyboard_warrior.Hubs
                 
             if(text != null)
             {
-                IEnumerable<string> usersExcluded = room
-                                                    .GetUsers()
-                                                    .Select(u => u.ConnectionId);
-                
-                await Clients
-                    .AllExcept(usersExcluded)
-                    .SendAsync("StartPlayTimer", room.GetRoomDTO());
-                await Clients
-                    .Group(roomId)
-                    .SendAsync("StartPlayTimer");
-
-                await Task.Delay(3000);
-
-                await Clients
-                    .Group(roomId)
-                    .SendAsync("StartGame", text);
+                    await StartGame(room);
             }
             else
             {
@@ -287,6 +283,30 @@ namespace keyboard_warrior.Hubs
                 _logger.LogError(ex, ex.Message);
                 return response.Send((int)HttpStatusCode.InternalServerError, ex.Message, null);
             }
+        }
+
+
+        private async Task StartGame(Room room)
+        {
+            RoomDTO roomDTO = room.GetRoomDTO();
+
+            IEnumerable<string> usersExcluded = room
+                                               .GetUsers()
+                                               .Select(u => u.ConnectionId);
+            await Clients
+                .AllExcept(usersExcluded)
+                .SendAsync("StartPlayTimer", roomDTO);
+            await Clients
+                .Group(roomDTO.Id)
+                .SendAsync("StartPlayTimer");
+
+            var text = await _gameHubServices.GetText(room.GetRoomTextType());
+
+            await Task.Delay(3000);
+
+            await Clients
+            .Group(roomDTO.Id)
+                .SendAsync("StartGame", text);
         }
     }
 }

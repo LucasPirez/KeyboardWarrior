@@ -1,8 +1,6 @@
 ﻿using keyboard_warrior.DTOs;
-using keyboard_warrior.enums;
-using keyboard_warrior.Hubs;
+using keyboard_warrior.enums; 
 using keyboard_warrior.Models;
-using Newtonsoft.Json.Linq;
 
 namespace keyboard_warrior.AppManager
 {
@@ -90,5 +88,9 @@ namespace keyboard_warrior.AppManager
             return RoomType;
         }
 
+        public RoomState GetRoomState()
+        {
+            return State;
+        }
     }
 }
