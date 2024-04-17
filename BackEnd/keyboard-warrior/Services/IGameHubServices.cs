@@ -6,9 +6,9 @@ namespace keyboard_warrior.Services
 {
     public interface IGameHubServices
     {
-        Task<(RoomDTO?,bool)> OnDisconected(string connectionId);
+        Task<(Room?, bool)> OnDisconected(string connectionId);
 
-        Task<bool> Login(string userName,string connectionId);
+        Task<bool> Login(string userName, string connectionId);
 
         Task<RoomDTO?> CreateRoom(string userName, string roomName, string roomTextType);
 
@@ -18,7 +18,7 @@ namespace keyboard_warrior.Services
 
         Task<RoomDTO?> GetRoom(string roomId);
 
-        Task<RoomDTO?> RemoveUserRoom(string roomId, string userName);
+        Task<Room?> RemoveUserRoom(string roomId, string userName);
 
         Task<bool> NotReady(string userName, string roomId);
 
@@ -27,6 +27,9 @@ namespace keyboard_warrior.Services
         Task<Room> RestartRoom(string roomId);
 
         Task<string> GetPracticeText(string roomTextType);
+
         Task<string> GetText(RoomTextType roomTextType);
+
+        Task<bool> theGameStarts(Room room);
     }
 }
