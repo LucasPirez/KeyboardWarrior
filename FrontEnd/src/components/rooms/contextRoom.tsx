@@ -15,6 +15,7 @@ interface State {
     string,
     {
       percentage: number;
+      ready: boolean;
     }
   >;
   roomState: RoomStateType;
@@ -29,7 +30,7 @@ interface State {
   handleSetUsersState: ({
     userObj,
   }: {
-    [key: string]: { percentage: number };
+    [key: string]: { percentage?: number; ready?: boolean };
   }) => void;
   handleSetRoom: (getRoom: Room) => void;
   handleSetText: (text: string) => void;
@@ -125,8 +126,10 @@ export default function ContextRoomProvider({
   };
 
   const handleSetUsersState = (userObj: {
-    [key: string]: { percentage: number };
+    [key: string]: { percentage?: number; ready?: boolean };
   }): void => {
+    console.log(userObj);
+
     setUsersPlayState((prev) => ({ ...prev, ...userObj }));
   };
 
