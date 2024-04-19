@@ -5,6 +5,7 @@ export const SOCKET_MESSAGES = {
   GET_ROOM: 'GetRoom',
   DELETE_ROOM: 'deleteRoom',
   CHANGE_USER_ROOM: 'ChangeUserInRoom',
+  CHANGE_STATE_USER: 'ChangeStateUser',
   JOIN_ROOM: 'JoinRoom',
   REMOVE_USER: 'RemoveUserRoom',
   READY: 'Ready',

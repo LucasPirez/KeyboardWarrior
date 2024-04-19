@@ -8,3 +8,5 @@ export { CREATE_ROOM_STATE } from './createRoomState';
 export { DIC_COLORS } from './color-languages';
 export { cpmWpm } from './wpm-cpm';
 export { COLORS_SHOW_VALUES } from './color-show-values';
+export { keyboardLetters } from './keyboard-letters';
+export { TEXT_LOGIN } from './text-login';
