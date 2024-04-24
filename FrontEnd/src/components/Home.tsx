@@ -1,4 +1,4 @@
-import CreateRoom from './create-room/CreateRoom';
+import { CreateRoom } from './create-room';
 import Room from './InfoRoom';
 import SelectPractice from './SelectPractice';
 
