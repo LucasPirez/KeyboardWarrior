@@ -1,6 +1,6 @@
 import { SOCKET_MESSAGES } from '../../constants';
 import Timer from '../Timer';
-import ToggleButtonReady from '../buttons/ToggleButtonReady';
+import { ToggleButtonReady } from '../buttons';
 import { useEffect, useRef, useState } from 'react';
 import stylesLocal from './containerTypingPractice.module.css';
 import WritingVisualization from '../WritingVisualization';

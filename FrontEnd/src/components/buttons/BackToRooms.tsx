@@ -12,6 +12,8 @@ export function BackToRooms({ roomId, className }: Props) {
   const handleBackToRooms = async () => {
     if (!roomId) return navigateTo({ path: PATH.rooms });
     try {
+      navigateTo({ path: PATH.rooms });
+
       const response = await serviceGame.removeUser(
         roomId,
         window.sessionStorage.getItem(SESSION_STORAGE) ?? ''
@@ -20,8 +22,6 @@ export function BackToRooms({ roomId, className }: Props) {
       if (!response) {
         throw new Error('Some error has ocurred');
       }
-
-      navigateTo({ path: PATH.rooms });
     } catch (error) {
       alert(error);
     }

@@ -19,7 +19,7 @@ interface Props {
   labelStart?: string;
 }
 
-export default function ToggleButtonReady({
+export function ToggleButtonReady({
   service,
   roomId,
   setStateToggle,

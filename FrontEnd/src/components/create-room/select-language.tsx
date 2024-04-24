@@ -16,7 +16,7 @@ interface Props {
 
 const { ROOM_TYPE } = CREATE_ROOM_STATE;
 
-export default function DropDown({ handleChange, roomValue }: Props) {
+export function DropDown({ handleChange, roomValue }: Props) {
   const options = Object.values(LANGUAGES).map((language) => ({
     name: language,
   }));

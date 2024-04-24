@@ -13,11 +13,11 @@ import { ChangeEvent, FormEvent, useState } from 'react';
 import { RoomType } from '../../type';
 
 import styles from './createRoom.module.css';
-import DropDown from './select-language';
+import { DropDown } from './select-language';
 
 const { ROOM_NAME, ROOM_TYPE } = CREATE_ROOM_STATE;
 
-export default function CreateRoom() {
+export function CreateRoom() {
   const [roomValue, setRoomValue] = useState<RoomType>({
     [ROOM_NAME]: '',
     [ROOM_TYPE]: LANGUAGES.NORMAL_TEXT,

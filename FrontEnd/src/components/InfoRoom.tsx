@@ -96,14 +96,12 @@ export default function Room() {
         <Card
           key={Math.random()}
           style={{
-            background: `${
-              room.state === ROOM_STATES.PLAYING
-                ? 'var(--text-color-secondary)'
-                : ''
+            opacity: `${
+              room.state === ROOM_STATES.PLAYING ? 0.6 : ''
             }`,
           }}
           title={room.name}
-          className="card">
+          className={`card`}>
           <p className="text-descriptors">
             Text:{' '}
             <span

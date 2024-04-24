@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import DropDown from './create-room/select-language';
+import { DropDown } from './create-room';
 import { type RoomType } from '../type';
 import { LANGUAGES, PATH } from '../constants';
 import { DropdownChangeEvent } from 'primereact/dropdown';
