@@ -1,6 +1,6 @@
 .container {
   position: relative;
-  width: 90vw;
+  width: 98w;
   height: auto;
   margin: auto;
   margin-bottom: 200px;
@@ -16,14 +16,14 @@
   font-size: 2.3rem;
 }
 
-.containerGame {
+.subContainer {
   position: relative;
   margin: auto;
   display: flex;
   justify-content: space-around;
   max-width: 1100px;
   flex-wrap: wrap;
-  padding: 30px 0;
+  gap: 40px;
   border-radius: 10px;
   background: var(--gray-800);
 }
@@ -34,12 +34,45 @@
   left: 0;
 }
 
+.containerListUsers {
+  flex-basis: 30%;
+  padding: 0 10px;
+}
+
+.containerGame {
+  position: relative;
+  flex-basis: 60%;
+  min-height: 300px;
+  min-width: 500px;
+  max-height: 400px;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  color: var(--gray-700);
+  border: 2px solid #5995a080;
+  border-radius: 9px;
+  box-shadow: 0px 4px 6px #5995a040;
+}
+
 @media (max-width: 900px) {
   .container {
     width: 93vw;
   }
 
-  .listUserContainer {
-    margin-bottom: 30px;
+  .containerListUsers {
+    flex-basis: 40%;
+  }
+
+  .containerGame {
+    min-width: 320px;
+    flex-basis: 80%;
+  }
+}
+
+@media (max-width: 700px) {
+  .containerGame {
+    flex-basis: 93%;
   }
 }

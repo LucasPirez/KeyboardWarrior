@@ -106,7 +106,7 @@ export default function RoomPage() {
     <>
       <TablePosition />
       {room ? (
-        <section className={styles.container}>
+        <article className={styles.container}>
           <BackToRooms
             roomId={room.id}
             className={styles.buttonBack}
@@ -114,18 +114,20 @@ export default function RoomPage() {
           <header>
             <h2 className={styles.title}>{room.name}</h2>
           </header>
-          <article className={styles.containerGame}>
-            <div className={styles.listUserContainer}>
+          <section className={styles.subContainer}>
+            <section className={styles.containerListUsers}>
               <ListUsers percentageUser={percentage} />
-            </div>
-            <RenderGame
-              handleSetPercentage={handleSetPercentage}
-              refError={refError.current}
-              refTimeTyping={refTimeTyping.current}
-              handleMutableError={handleMutableError}
-            />
-          </article>
-        </section>
+            </section>
+            <section className={styles.containerGame}>
+              <RenderGame
+                handleSetPercentage={handleSetPercentage}
+                refError={refError.current}
+                refTimeTyping={refTimeTyping.current}
+                handleMutableError={handleMutableError}
+              />
+            </section>
+          </section>
+        </article>
       ) : (
         ''
       )}

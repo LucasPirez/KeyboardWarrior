@@ -1,5 +1,4 @@
-import styles from './textContainer.module.css';
-import ToggleButtonReady from '../buttons/ToggleButtonReady';
+import { ToggleButtonReady } from '../buttons';
 import { useContextRoom } from './contextRoom';
 import { PATH, ROOM_STATES } from '../../constants';
 import Timer from '../Timer';
@@ -101,9 +100,5 @@ export default function RenderGame({
     ),
   };
 
-  return (
-    <article className={styles.container}>
-      {RenderDic[roomState]}
-    </article>
-  );
+  return <>{RenderDic[roomState]}</>;
 }

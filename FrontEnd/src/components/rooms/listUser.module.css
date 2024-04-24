@@ -1,0 +1,15 @@
+.container {
+  font-weight: bold;
+  font-size: 1.3em;
+  color: var(--surface-800);
+}
+
+.container > span {
+  font-size: 1.34em;
+  font-weight: 600;
+}
+
+.player {
+  color: var(--orange-400);
+  opacity: 0.9;
+}

@@ -57,16 +57,14 @@ export default function ContainerTyping({
   }
 
   return (
-    <>
-      <WritingVisualization
-        handleSetPercentage={setPercentage}
-        textReceived={room.text}
-        finish={handleFinish}
-        inactiveUser={handleInactiveUser}
-        intervalPercentage={handleIntervalPercentage}
-        isInactive={60}
-        handleError={handleError}
-      />
-    </>
+    <WritingVisualization
+      handleSetPercentage={setPercentage}
+      textReceived={room.text}
+      finish={handleFinish}
+      inactiveUser={handleInactiveUser}
+      intervalPercentage={handleIntervalPercentage}
+      isInactive={860}
+      handleError={handleError}
+    />
   );
 }
