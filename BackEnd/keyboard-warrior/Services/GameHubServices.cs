@@ -2,6 +2,7 @@
 using keyboard_warrior.DTOs;
 using keyboard_warrior.enums;
 using keyboard_warrior.Exceptions;
+using keyboard_warrior.Messages;
 using keyboard_warrior.Models;
 using keyboard_warrior.Texts;
 using System.Net;
@@ -50,7 +51,7 @@ namespace keyboard_warrior.Services
         public async Task<RoomDTO?> CreateRoom(string userName, string roomName, string roomTextType)
         {
             UserConnection? user = await _stateUsers.GetUser(userName);
-            if (user == null) throw new MyException("User doesn't exist please login again",(int)HttpStatusCode.NotFound);
+            if (user == null) throw new MyException(ResponseMessages.UserNotExist,(int)HttpStatusCode.NotFound);
 
             var room = await _roomsState.CreateRoom(roomName, roomTextType);
 
@@ -66,16 +67,16 @@ namespace keyboard_warrior.Services
 
             if (room?.GetRoomDTO().State == RoomState.Playing.ToString())
             {
-                return response.Send((int)HttpStatusCode.NotAcceptable, "You can't in to room when it's playing", room.GetRoomDTO());
+                return response.Send((int)HttpStatusCode.NotAcceptable,ResponseMessages.NotJoinRoomWhenIsPlaying , room.GetRoomDTO());
             }
 
             if (IsUserAdd && room != null)
             {
-                return response.Send((int)HttpStatusCode.OK, "User add with exist", room.GetRoomDTO());
+                return response.Send((int)HttpStatusCode.OK, ResponseMessages.JoinRoomSuccess, room.GetRoomDTO());
             }
             else
             {
-                return response.Send((int)HttpStatusCode.InternalServerError, "Some error has ocurred",null);
+                return response.Send((int)HttpStatusCode.InternalServerError, ResponseMessages.InternalServerError,null);
 
             }
 

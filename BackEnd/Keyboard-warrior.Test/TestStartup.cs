@@ -6,14 +6,13 @@ namespace Keyboard_warrior.Test
 {
     public class TestStartup
     {
-        public IServiceCollection Services { get; }
+        public IServiceCollection Services { get; } = new ServiceCollection();
 
-        public TestStartup()
+        public  TestStartup()
         {
-            Services = new ServiceCollection();
-            Services.AddScoped( provider =>
+            Services.AddTransient(provider =>
             {
-             /*   var handler = provider.GetRequiredService<HttpMessageHandler>();*/
+                /*   var handler = provider.GetRequiredService<HttpMessageHandler>();*/
                 var connection = new HubConnectionBuilder()
                     .WithUrl("https://localhost:7088/Play", o =>
                     {

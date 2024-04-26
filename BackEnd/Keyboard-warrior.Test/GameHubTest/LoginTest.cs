@@ -1,26 +1,27 @@
-
-
 using keyboard_warrior.DTOs;
+using keyboard_warrior.Hubs;
+using keyboard_warrior.Messages;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 using System.Net;
 using Xunit.Abstractions;
 
 
-namespace Keyboard_warrior.Test.GameHub
+namespace Keyboard_warrior.Test.GameHubTest
 {
     [Collection("IntegrationTest")]
-    public class Login
+    public class LoginTest
     {
         private readonly HubConnection _connection;
-        private readonly ITestOutputHelper _output;
-        private readonly string _methodName = "Login";
-     
-        public Login(TestStartup fixture,ITestOutputHelper testOutputHelper)
+        private readonly HubConnection _secondConnection;
+        private readonly string _methodName = nameof(GameHub.Login);
+
+        public LoginTest(TestStartup fixture)
         {
             _connection = fixture.Services.BuildServiceProvider().GetRequiredService<HubConnection>();
-            _output = testOutputHelper; 
-         
+            _secondConnection = fixture.Services.BuildServiceProvider().GetRequiredService<HubConnection>();
+
         }
 
 
@@ -28,23 +29,24 @@ namespace Keyboard_warrior.Test.GameHub
         public async Task LoginUser_ReturnsOkStatus()
         {
             string message = "user1";
-            var response =  await _connection.InvokeAsync<SocketResponseDTO<bool>>(_methodName, message);
+            var response = await _connection.InvokeAsync<SocketResponseDTO<bool>>(_methodName, message);
 
             Assert.Equal((int)HttpStatusCode.OK,response.Code);
-            Assert.Equal("User Created",response.Message);
+            Assert.Equal(ResponseMessages.LoginSucces,response.Message);
             Assert.True(response.Data);
+
         }
 
         [Fact]
         public async Task LoginDuplicatedUserName_Returns409Status()
         {  
             string message = "user2";
-            await _connection.InvokeAsync(_methodName, message);
+            await _secondConnection.InvokeAsync(_methodName, message);
 
             var response = await _connection.InvokeAsync<SocketResponseDTO<bool>>(_methodName, message);
             
             Assert.Equal((int)HttpStatusCode.Conflict, response.Code);
-            Assert.Equal("User already exist", response.Message);
+            Assert.Equal(ResponseMessages.UserNameExist, response.Message);
             Assert.False(response.Data);
         }
     }

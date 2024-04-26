@@ -1,7 +1,7 @@
 ﻿using keyboard_warrior.AppManager;
 using keyboard_warrior.DTOs;
-using keyboard_warrior.enums;
 using keyboard_warrior.Exceptions;
+using keyboard_warrior.Messages;
 using keyboard_warrior.Services;
 using Microsoft.AspNetCore.SignalR;
 using System.Net;
@@ -64,10 +64,10 @@ namespace keyboard_warrior.Hubs
 
             if (await _gameHubServices.Login(userName, Context.ConnectionId))
             {  
-             return response.Send((int)HttpStatusCode.Conflict,"User already exist", false ); 
+             return response.Send((int)HttpStatusCode.Conflict,ResponseMessages.UserNameExist, false ); 
             }
 
-                return response.Send((int)HttpStatusCode.OK, "User Created", true);
+                return response.Send((int)HttpStatusCode.OK, ResponseMessages.LoginSucces, true);
             }     
             catch (Exception e)
             {
@@ -87,7 +87,7 @@ namespace keyboard_warrior.Hubs
                 await Groups.AddToGroupAsync(Context.ConnectionId, roomDTO.Id);
                 await Clients.All.SendAsync("CreateRoom", roomDTO);
 
-                return response.Send((int)HttpStatusCode.OK, "Room Created", roomDTO);
+                return response.Send((int)HttpStatusCode.OK, ResponseMessages.RoomCreated, roomDTO);
             }
             catch (MyException e)
             {
@@ -127,7 +127,7 @@ namespace keyboard_warrior.Hubs
             try
             {
             var service = await _gameHubServices.GetRooms();
-            return new SocketResponseDTO<IEnumerable<RoomDTO>?>((int)HttpStatusCode.OK, "Ok", service);
+            return new SocketResponseDTO<IEnumerable<RoomDTO>?>((int)HttpStatusCode.OK, ResponseMessages.Ok, service);
             }
             catch (Exception e)
             {
@@ -142,7 +142,7 @@ namespace keyboard_warrior.Hubs
             {
 
             var service = await _gameHubServices.GetRoom(id);
-            return new SocketResponseDTO<RoomDTO?>((int)HttpStatusCode.OK, "Ok", service);
+            return new SocketResponseDTO<RoomDTO?>((int)HttpStatusCode.OK, ResponseMessages.Ok, service);
             }
             catch (Exception e)
             {
@@ -164,7 +164,7 @@ namespace keyboard_warrior.Hubs
                 if (room == null)
                 {
                     await Clients.All.SendAsync("DeleteRoom", roomId);
-                    return  new SocketResponseDTO<bool>((int)HttpStatusCode.OK, "user removed", true);
+                    return  new SocketResponseDTO<bool>((int)HttpStatusCode.OK, ResponseMessages.UserRemoved, true);
                 }
 
                 await Clients.All.SendAsync("ChangeUserInRoom", room.GetRoomDTO());
@@ -175,7 +175,7 @@ namespace keyboard_warrior.Hubs
                     await StartGame(room);
                 }
 
-                return new SocketResponseDTO<bool>((int)HttpStatusCode.OK, "user removed", true);
+                return new SocketResponseDTO<bool>((int)HttpStatusCode.OK, ResponseMessages.UserRemoved, true);
 
             }
             catch(MyException e)
