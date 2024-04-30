@@ -3,9 +3,7 @@ using keyboard_warrior.Hubs;
 using keyboard_warrior.Messages;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.VisualStudio.TestPlatform.Utilities;
 using System.Net;
-using Xunit.Abstractions;
 
 
 namespace Keyboard_warrior.Test.GameHubTest
@@ -29,11 +27,11 @@ namespace Keyboard_warrior.Test.GameHubTest
         public async Task LoginUser_ReturnsOkStatus()
         {
             string message = "user1";
-            var response = await _connection.InvokeAsync<SocketResponseDTO<bool>>(_methodName, message);
+            var response = await _connection.InvokeAsync<SocketResponseDTO<UserDTO>>(_methodName, message);
 
             Assert.Equal((int)HttpStatusCode.OK,response.Code);
             Assert.Equal(ResponseMessages.LoginSucces,response.Message);
-            Assert.True(response.Data);
+            Assert.Equal(message,response.Data?.UserName);
 
         }
 
@@ -43,11 +41,11 @@ namespace Keyboard_warrior.Test.GameHubTest
             string message = "user2";
             await _secondConnection.InvokeAsync(_methodName, message);
 
-            var response = await _connection.InvokeAsync<SocketResponseDTO<bool>>(_methodName, message);
+            var response = await _connection.InvokeAsync<SocketResponseDTO<UserDTO>>(_methodName, message);
             
             Assert.Equal((int)HttpStatusCode.Conflict, response.Code);
             Assert.Equal(ResponseMessages.UserNameExist, response.Message);
-            Assert.False(response.Data);
+            Assert.Null(response.Data);
         }
     }
 }

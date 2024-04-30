@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.SignalR.Client;
+﻿using keyboard_warrior.Models;
+using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
 
 
@@ -8,7 +9,7 @@ namespace Keyboard_warrior.Test
     {
         public IServiceCollection Services { get; } = new ServiceCollection();
 
-        public  TestStartup()
+        public TestStartup()
         {
             Services.AddTransient(provider =>
             {
@@ -23,8 +24,10 @@ namespace Keyboard_warrior.Test
                 connection.StartAsync().Wait();
                 return connection;
             });
+
+            Services.AddTransient<Utils>();
         }
     }
     [CollectionDefinition("IntegrationTest")]
-    public class IntegrationTestCollection : ICollectionFixture<TestStartup> { }
+    public class IntegrationTestCollection : ICollectionFixture<TestStartup>{ }
 }
