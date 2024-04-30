@@ -9,13 +9,19 @@ namespace keyboard_warrior.AppManager
         private ConcurrentDictionary<string, UserConnection> connectedUsers = new ConcurrentDictionary<string, UserConnection>();
 
 
-        public async  Task AddUser(string username,string connectionId)
+        public async  Task<UserConnection?> AddUser(string username,string connectionId)
         {
             string guid = Guid.NewGuid().ToString();
 
             UserConnection newUser = new(guid, username,connectionId);
 
-            connectedUsers.TryAdd(username, newUser);
+            if(connectedUsers.TryAdd(username, newUser))
+            {
+                return newUser;
+            }
+
+            return null;
+
         }
 
         public async Task<string> See()

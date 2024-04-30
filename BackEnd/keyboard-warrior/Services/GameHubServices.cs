@@ -35,17 +35,17 @@ namespace keyboard_warrior.Services
                 return (room, false);
         }
 
-        public async Task<bool> Login(string userName, string connectionId)
+        public async Task<UserConnection?> Login(string userName, string connectionId)
         {
          bool isExist = await  _stateUsers.IsUserExist(userName);
 
             if(!isExist)
             {
-                Console.WriteLine("User Add");
-                await _stateUsers.AddUser(userName, connectionId);
+             return   await _stateUsers.AddUser(userName, connectionId);
             }
 
-            return isExist;
+            return null;
+
         }
 
         public async Task<RoomDTO?> CreateRoom(string userName, string roomName, string roomTextType)

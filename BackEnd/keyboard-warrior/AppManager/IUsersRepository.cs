@@ -7,7 +7,7 @@ namespace keyboard_warrior.AppManager
 
         Task RemoveUser(string username);
          Task<bool> IsUserExist(string username);
-        Task AddUser(string username, string connectionId);
+        Task<UserConnection?> AddUser(string username, string connectionId);
 
         Task<UserConnection?> GetUser(string username);
         Task<UserConnection?> GetUserByConnectionId(string connectionId);

@@ -2,6 +2,7 @@
 using keyboard_warrior.DTOs;
 using keyboard_warrior.Exceptions;
 using keyboard_warrior.Messages;
+using keyboard_warrior.Models;
 using keyboard_warrior.Services;
 using Microsoft.AspNetCore.SignalR;
 using System.Net;
@@ -56,37 +57,42 @@ namespace keyboard_warrior.Hubs
             
         }
 
-        public async Task<SocketResponseDTO<bool>> Login(string userName)
+        public async Task<SocketResponseDTO<UserDTO?>> Login(string userName)
         {
-            SocketResponseDTO<bool> response = new();
+            SocketResponseDTO<UserDTO?> response = new();
             try
             {
-
-            if (await _gameHubServices.Login(userName, Context.ConnectionId))
+                UserConnection? user = await _gameHubServices.Login(userName, Context.ConnectionId);
+            if (user == null)
             {  
-             return response.Send((int)HttpStatusCode.Conflict,ResponseMessages.UserNameExist, false ); 
+             return response.Send((int)HttpStatusCode.Conflict,ResponseMessages.UserNameExist, null ); 
             }
+                UserDTO userDTO = new()
+                {
+                    UserName = user.UserName,
+                    Id = user.Id,
+                };
 
-                return response.Send((int)HttpStatusCode.OK, ResponseMessages.LoginSucces, true);
+                return response.Send((int)HttpStatusCode.OK, ResponseMessages.LoginSucces, userDTO);
             }     
             catch (Exception e)
             {
                 _logger.LogError(e, e.Message);
-                return response.Send((int)HttpStatusCode.InternalServerError, e.Message, false);
+                return response.Send((int)HttpStatusCode.InternalServerError, e.Message, null);
             }
         }
 
         public async Task<SocketResponseDTO<RoomDTO?>> CreateRoom(string userName, string roomName,string roomTextType)
         {
             SocketResponseDTO<RoomDTO?> response = new();
-
+       
             try
             {
                 RoomDTO? roomDTO = await _gameHubServices.CreateRoom(userName,roomName,roomTextType);
          
                 await Groups.AddToGroupAsync(Context.ConnectionId, roomDTO.Id);
                 await Clients.All.SendAsync("CreateRoom", roomDTO);
-
+             
                 return response.Send((int)HttpStatusCode.OK, ResponseMessages.RoomCreated, roomDTO);
             }
             catch (MyException e)
@@ -151,7 +157,6 @@ namespace keyboard_warrior.Hubs
             }
 
         }
-
 
         public async Task<SocketResponseDTO<bool>> RemoveUserRoom(string roomId, string userName)
         {

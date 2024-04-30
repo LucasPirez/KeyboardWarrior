@@ -19,10 +19,10 @@ namespace keyboard_warrior.AppManager
       
         public async Task<RoomDTO?> CreateRoom(string roomName,string typeTextRoom )
         {
-            Room room = new Room(roomName, typeTextRoom);         
+            Room room = new Room(roomName, typeTextRoom);
 
             if(rooms.TryAdd(room.GetRoomDTO().Id, room))
-            {
+            { 
                 return room.GetRoomDTO();
             }
             else

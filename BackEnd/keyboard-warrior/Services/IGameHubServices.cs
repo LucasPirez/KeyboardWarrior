@@ -1,6 +1,7 @@
 ﻿using keyboard_warrior.AppManager;
 using keyboard_warrior.DTOs;
 using keyboard_warrior.enums;
+using keyboard_warrior.Models;
 
 namespace keyboard_warrior.Services
 {
@@ -8,7 +9,7 @@ namespace keyboard_warrior.Services
     {
         Task<(Room?, bool)> OnDisconected(string connectionId);
 
-        Task<bool> Login(string userName, string connectionId);
+        Task<UserConnection?> Login(string userName, string connectionId);
 
         Task<RoomDTO?> CreateRoom(string userName, string roomName, string roomTextType);
 
