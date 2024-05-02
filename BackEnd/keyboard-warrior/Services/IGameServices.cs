@@ -5,7 +5,7 @@ using keyboard_warrior.Models;
 
 namespace keyboard_warrior.Services
 {
-    public interface IGameHubServices
+    public interface IGameServices
     {
         Task<(Room?, bool)> OnDisconected(string connectionId);
 

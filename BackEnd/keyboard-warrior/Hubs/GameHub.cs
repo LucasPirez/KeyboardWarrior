@@ -10,10 +10,12 @@ using System.Net;
 
 namespace keyboard_warrior.Hubs
 {
-    public class GameHub(IGameHubServices gameHubServices,ILogger<GameHub> logger) : Hub
+    public class GameHub(IGameServices gameHubServices,ILogger<GameHub> logger,IClientHubServices 
+       clientHubServices ) : Hub
     {
-        private IGameHubServices _gameHubServices = gameHubServices;
+        private IGameServices _gameHubServices = gameHubServices;
         private ILogger<GameHub> _logger = logger;
+        private IClientHubServices _clientHubServices = clientHubServices;
 
         public override async Task OnConnectedAsync()
         {
@@ -23,7 +25,7 @@ namespace keyboard_warrior.Hubs
         }
 
         public override async Task OnDisconnectedAsync(Exception exception)
-        {
+        { 
             try
             {
                 var (room,deleted) = await _gameHubServices.OnDisconected(Context.ConnectionId);
@@ -44,7 +46,7 @@ namespace keyboard_warrior.Hubs
                 }
                 else
                 {
-                    await Clients.All.SendAsync("DeleteRoom", roomDTO.Id);
+                        await _clientHubServices.DeleteRoom(roomDTO.Id);
                 }
                 }
                 
@@ -91,7 +93,7 @@ namespace keyboard_warrior.Hubs
                 RoomDTO? roomDTO = await _gameHubServices.CreateRoom(userName,roomName,roomTextType);
          
                 await Groups.AddToGroupAsync(Context.ConnectionId, roomDTO.Id);
-                await Clients.All.SendAsync("CreateRoom", roomDTO);
+                await _clientHubServices.CreateRoom(roomDTO);
              
                 return response.Send((int)HttpStatusCode.OK, ResponseMessages.RoomCreated, roomDTO);
             }
@@ -116,8 +118,7 @@ namespace keyboard_warrior.Hubs
                 if (service.Code == (int)HttpStatusCode.OK && service.Data != null)
                 {
                     await Groups.AddToGroupAsync(Context.ConnectionId, service.Data.Id);
-                    await Clients.GroupExcept(roomId, Context.ConnectionId).SendAsync("RoomData", service.Data);
-                    await Clients.AllExcept(Context.ConnectionId).SendAsync("ChangeUserInRoom", service.Data);
+                    await _clientHubServices.JoinRoom(Context.ConnectionId,service.Data);
                 }
                 return service;
             }
@@ -168,12 +169,11 @@ namespace keyboard_warrior.Hubs
 
                 if (room == null)
                 {
-                    await Clients.All.SendAsync("DeleteRoom", roomId);
+                    await _clientHubServices.DeleteRoom(roomId);
                     return  new SocketResponseDTO<bool>((int)HttpStatusCode.OK, ResponseMessages.UserRemoved, true);
                 }
 
-                await Clients.All.SendAsync("ChangeUserInRoom", room.GetRoomDTO());
-                await Clients.Group(roomId).SendAsync("RoomData", room.GetRoomDTO());
+                await _clientHubServices.RemoveUserRoom(roomId, room.GetRoomDTO());
 
                 if (await _gameHubServices.theGameStarts(room))
                 {
@@ -203,7 +203,8 @@ namespace keyboard_warrior.Hubs
             try
             {
             await _gameHubServices.NotReady(userName,roomId);
-            await Clients.Group(roomId).SendAsync("ChangeStateUser", userName, false);
+                await _clientHubServices.ChangeStateUser(roomId, userName, false);
+
             }
             catch (Exception ex)
             {
@@ -223,9 +224,7 @@ namespace keyboard_warrior.Hubs
             }
             else
             {
-                await Clients
-                    .Group(roomId)
-                    .SendAsync("ChangeStateUser",userName,true);
+                await _clientHubServices.ChangeStateUser(roomId, userName, true);
             }
             }
             catch(MyException ex)
@@ -254,10 +253,7 @@ namespace keyboard_warrior.Hubs
 
             Room roomRestarted = await _gameHubServices.RestartRoom(roomId);
 
-                await Clients.Groups(roomId)
-                             .SendAsync("RestartRoom",roomRestarted.GetRoomDTO());
-                await Clients.AllExcept(roomRestarted.GetUsers().Select(u=> u.ConnectionId))
-                             .SendAsync("ChangeUserInRoom",roomRestarted.GetRoomDTO());
+                await _clientHubServices.RestartRoom(roomId, roomRestarted);
             }   
             catch(Exception ex)
             {
