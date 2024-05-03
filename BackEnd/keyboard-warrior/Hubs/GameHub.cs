@@ -10,12 +10,12 @@ using System.Net;
 
 namespace keyboard_warrior.Hubs
 {
-    public class GameHub(IGameServices gameHubServices,ILogger<GameHub> logger,IClientHubServices 
+    public class GameHub(IGameServices gameHubServices,ILogger<GameHub> logger,IClientHubMessagesService 
        clientHubServices ) : Hub
     {
-        private IGameServices _gameHubServices = gameHubServices;
-        private ILogger<GameHub> _logger = logger;
-        private IClientHubServices _clientHubServices = clientHubServices;
+        private readonly IGameServices _gameHubServices = gameHubServices;
+        private readonly ILogger<GameHub> _logger = logger;
+        private readonly IClientHubMessagesService _clientHubServices = clientHubServices;
 
         public override async Task OnConnectedAsync()
         {
@@ -36,8 +36,7 @@ namespace keyboard_warrior.Hubs
                 if (!deleted)
                 {
                     await Groups.RemoveFromGroupAsync(Context.ConnectionId, roomDTO.Id);
-                    await Clients.All.SendAsync("ChangeUserInRoom", roomDTO);
-                    await Clients.Group(roomDTO.Id).SendAsync("RoomData", roomDTO);
+                    await _clientHubServices.RemoveUserRoom(Context.ConnectionId,roomDTO);
 
                     if(await _gameHubServices.theGameStarts(room))
                         {
@@ -173,7 +172,7 @@ namespace keyboard_warrior.Hubs
                     return  new SocketResponseDTO<bool>((int)HttpStatusCode.OK, ResponseMessages.UserRemoved, true);
                 }
 
-                await _clientHubServices.RemoveUserRoom(roomId, room.GetRoomDTO());
+                await _clientHubServices.RemoveUserRoom(Context.ConnectionId,room.GetRoomDTO());
 
                 if (await _gameHubServices.theGameStarts(room))
                 {
@@ -239,11 +238,11 @@ namespace keyboard_warrior.Hubs
 
         public async void TextTypedPercentage(int percentage,string userName,string roomId )
         {
-            await Clients.Group(roomId).SendAsync("TextTypedPercentage", userName, percentage);
+            await _clientHubServices.TextTypedPercentage(roomId, userName, percentage);
         }
         public async void FinishGame(string userNameAndTimesStamp, string roomId)
         {
-            await Clients.Group(roomId).SendAsync("FinishGame", userNameAndTimesStamp);
+            await _clientHubServices.FinishGame(roomId, userNameAndTimesStamp);
         }
  
         public async Task RestartRoom(string roomId) 
@@ -294,20 +293,14 @@ namespace keyboard_warrior.Hubs
             IEnumerable<string> usersExcluded = room
                                                .GetUsers()
                                                .Select(u => u.ConnectionId);
-            await Clients
-                .AllExcept(usersExcluded)
-                .SendAsync("StartPlayTimer", roomDTO);
-            await Clients
-                .Group(roomDTO.Id)
-                .SendAsync("StartPlayTimer");
+
+            await _clientHubServices.StartPlayTimer(usersExcluded, roomDTO);
 
             var text = await _gameHubServices.GetText(room.GetRoomTextType());
 
             await Task.Delay(3000);
 
-            await Clients
-            .Group(roomDTO.Id)
-                .SendAsync("StartGame", text);
+            await _clientHubServices.StartGame(roomDTO.Id, text);
         }
     }
 }
