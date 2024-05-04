@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import Login from './components/Login';
+import { Login } from './components/login';
 import { PATH, PathType } from './constants/paths';
 import { serviceGame } from './services';
 import Home from './components/Home';
@@ -8,6 +8,8 @@ import { useLogin } from './hooks/useLogin';
 import { useUser } from './hooks/useUser';
 import { Layout } from './components/Layout';
 import PracticeRoom from './components/practice-room/PracticeRoom';
+import NotFoundPage from './components/404-page';
+import ErrorComponent from './components/error';
 
 function App() {
   const [currentPath, setCurrentPath] = useState<
@@ -18,8 +20,6 @@ function App() {
 
   const handleAuth = async () => {
     if (!userName) {
-      console.log('if este no username');
-
       window.location.hash = PATH.login;
       setCurrentPath(PATH.login);
       return;
@@ -76,14 +76,15 @@ function App() {
     [PATH.login]: <Login />,
     [PATH.rooms]: <Home />,
     [PATH.practice]: <PracticeRoom />,
-    [PATH.error]: <h1>some error has ocurred</h1>,
+    [PATH.error]: <ErrorComponent />,
   };
 
-  const Component = currentPath ? (
-    pageToRender[currentPath]
-  ) : (
-    <h2>leading</h2>
-  );
+  const Component =
+    currentPath && pageToRender[currentPath] ? (
+      pageToRender[currentPath]
+    ) : (
+      <NotFoundPage />
+    );
 
   return <Layout>{Component}</Layout>;
 }
