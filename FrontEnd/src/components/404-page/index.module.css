@@ -1,0 +1,29 @@
+.container {
+  max-width: 1300px;
+  height: 50vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.subContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  margin-bottom: 70px;
+}
+
+.number {
+  color: var(--pink-600);
+  font-size: 12em;
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande',
+    'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+.description {
+  color: var(--surface-600);
+  font-size: 4rem;
+  font-weight: 500;
+}
