@@ -1,13 +1,15 @@
 import { keyboardLetters } from '../../constants';
 import { Char } from './Char';
 
+import styles from './keyboard.module.css';
+
 interface Props {
   activeKey: Record<string, boolean>;
 }
 
 export default function Keyboard({ activeKey }: Props) {
   return (
-    <>
+    <div className={styles.container}>
       {keyboardLetters.map((uniqueKey) => {
         const char =
           typeof uniqueKey === 'string' ? uniqueKey : uniqueKey[0];
@@ -21,6 +23,6 @@ export default function Keyboard({ activeKey }: Props) {
           />
         );
       })}
-    </>
+    </div>
   );
 }

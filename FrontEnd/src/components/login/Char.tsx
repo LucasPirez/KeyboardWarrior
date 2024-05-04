@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import styles from './login.module.css';
+import styles from './keyboard.module.css';
 
 interface Props {
   symbol?: string;
@@ -15,8 +15,10 @@ const Char = memo(function Char({ char, press, symbol }: Props) {
       key={String(char) + Math.random()}
       className={`${styles.keyContainer} ${
         !symbol
-          ? `${styles[char]}  ${styles.onlyOneChar}`
-          : styles[symbol]
+          ? `${styles[char as keyof typeof styles]}  ${
+              styles.onlyOneChar
+            }`
+          : styles[symbol as keyof typeof styles]
       }
       } ${press ? styles.activeKey : ''} ${isSlash && styles.Slash}`}>
       {!symbol ? (
