@@ -1,10 +1,10 @@
 import { SOCKET_MESSAGES } from '../constants/socket-messages';
-import { Room, RoomType, SocketResponse } from '../type';
+import { Room, RoomType, SocketResponse, User } from '../type';
 import SignalRManager from './SignalRManager.abstract';
 
 export interface IGameService {
   connectGame(): Promise<boolean>;
-  login(userName: string): Promise<boolean>;
+  login(userName: string): Promise<User>;
   listen(methodName: string, callback: (data: unknown) => void): void;
   removeListen(methodName: string): void;
   createRoom(
@@ -12,12 +12,12 @@ export interface IGameService {
     roomName: string,
     roomTextType: string
   ): Promise<SocketResponse<Room>>;
-  getRooms(): Promise<SocketResponse<Room[]> | null>;
-  getRoom(id: string): Promise<SocketResponse<Room> | null>;
+  getRooms(): Promise<SocketResponse<Room[]>>;
+  getRoom(id: string): Promise<SocketResponse<Room>>;
   joinRoom(
     roomId: string,
     userName: string
-  ): Promise<SocketResponse<Room> | null>;
+  ): Promise<SocketResponse<Room>>;
   removeUser(roomId: string, userName: string): Promise<boolean>;
   percentageTyped(
     percentage: number,
@@ -43,9 +43,7 @@ export interface IGameService {
     roomId: string;
   }): Promise<void>;
   restartRoom({ roomId }: { roomId: string }): Promise<void>;
-  getTextPractice(
-    roomType: RoomType['RoomType']
-  ): Promise<SocketResponse<string> | null>;
+  getTextPractice(roomType: RoomType['RoomType']): Promise<string>;
 }
 
 export class GameService
@@ -56,13 +54,17 @@ export class GameService
     return this.connect('/Play');
   }
 
-  async login(userName: string): Promise<boolean> {
-    const data = await this.invoke<boolean>(
+  async login(userName: string): Promise<User> {
+    const response = await this.invoke<User | null>(
       SOCKET_MESSAGES.LOGIN,
       userName
     );
 
-    return data?.data ?? false;
+    if (!response?.data || response?.code !== 200) {
+      throw new Error(response?.message);
+    }
+
+    return response.data;
   }
 
   async listen(
@@ -81,52 +83,60 @@ export class GameService
     roomName: string,
     roomTextType: string
   ): Promise<SocketResponse<Room>> {
-    try {
-      const response = await this.invoke<Room>(
-        SOCKET_MESSAGES.CREATE_ROOM,
-        userName,
-        roomName,
-        roomTextType
-      );
+    const response = await this.invoke<Room>(
+      SOCKET_MESSAGES.CREATE_ROOM,
+      userName,
+      roomName,
+      roomTextType
+    );
 
-      if (!response) throw new Error(`Unexpected error has ocurred`);
+    if (!response) throw new Error(`Unexpected error has ocurred`);
 
-      if (response.code !== 200) {
-        throw new Error(`${response.code}, ${response.message}`);
-      }
-
-      return response;
-    } catch (error) {
-      throw new Error(`${error}`);
+    if (response.code !== 200) {
+      throw new Error(`${response.code}, ${response.message}`);
     }
+
+    return response;
   }
 
-  async getRooms(): Promise<SocketResponse<Room[]> | null> {
+  async getRooms(): Promise<SocketResponse<Room[]>> {
     const response = await this.invoke<Room[]>(
       SOCKET_MESSAGES.GET_ROOMS
     );
 
-    return response ?? null;
+    if (response?.code !== 200) {
+      throw new Error(`${response?.code}, ${response?.message}`);
+    }
+
+    return response;
   }
 
-  async getRoom(id: string): Promise<SocketResponse<Room> | null> {
+  async getRoom(id: string): Promise<SocketResponse<Room>> {
     const response = await this.invoke<Room>(
       SOCKET_MESSAGES.GET_ROOM,
       id
     );
 
-    return response ?? null;
+    if (response?.code !== 200) {
+      throw new Error(`${response?.code}, ${response?.message}`);
+    }
+
+    return response;
   }
 
   async joinRoom(
     roomId: string,
     userName: string
-  ): Promise<SocketResponse<Room> | null> {
+  ): Promise<SocketResponse<Room>> {
     const response = await this.invoke<Room>(
       SOCKET_MESSAGES.JOIN_ROOM,
       roomId,
       userName
     );
+
+    if (response?.code !== 200) {
+      throw new Error(`${response?.code}, ${response?.message}`);
+    }
 
     return response;
   }
@@ -141,9 +151,11 @@ export class GameService
       userName
     );
 
-    if (response?.code === 200) return true;
+    if (response?.code !== 200) {
+      throw new Error(`${response?.code}, ${response?.message}`);
+    }
 
-    return false;
+    return true;
   }
 
   async percentageTyped(
@@ -158,9 +170,11 @@ export class GameService
       roomId
     );
 
-    if (response?.code === 200) return true;
+    if (response?.code !== 200) {
+      throw new Error(`${response?.code}, ${response?.message}`);
+    }
 
-    return false;
+    return true;
   }
 
   async toggleReady({
@@ -179,11 +193,17 @@ export class GameService
 
   async getTextPractice(
     roomType: RoomType['RoomType']
-  ): Promise<SocketResponse<string> | null> {
-    return await this.invoke<string>(
+  ): Promise<string> {
+    const response = await this.invoke<string | null>(
       SOCKET_MESSAGES.GET_TEXT_PRACTICE,
       roomType
     );
+
+    if (response?.code !== 200 || typeof response.data !== 'string') {
+      throw new Error(`${response?.code}, ${response?.message}`);
+    }
+
+    return response.data;
   }
 
   async finishGame({
