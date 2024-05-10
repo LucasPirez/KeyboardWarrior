@@ -24,8 +24,6 @@ export const typingVelocityHelper = ({
   } else {
     const chars = text.replace(/\s+/g, ' ').replace('\n', '').length;
 
-    console.log('chars,in helper', chars);
-
     const cpm = chars / (MilliSeconds / 60000);
     result.velocity = cpm.toFixed(2);
     result.roundVelocity = '' + Math.round(cpm);
