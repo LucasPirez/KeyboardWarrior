@@ -12,15 +12,25 @@
   padding: 50px 0;
   border-radius: 10px;
   background: var(--gray-800);
+  font-size: 1.3em;
 }
-
-.title {
-  text-align: center;
-  font-size: 3.3rem;
+.progressBar {
+  height: 30px;
+  min-width: 200px;
+  width: 400px;
+  display: inline-block;
+  vertical-align: top;
+  margin-left: 20px;
 }
 
 .buttonBackRooms {
   position: absolute;
   left: 0;
   top: 0;
+}
+
+@media (max-width: 800px) {
+  .progressBar {
+    margin-top: 30px;
+  }
 }

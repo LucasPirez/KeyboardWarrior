@@ -1,7 +1,11 @@
 .container {
+  max-width: 300px;
   font-weight: bold;
   font-size: 1.3em;
   color: var(--surface-800);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .container > span {
