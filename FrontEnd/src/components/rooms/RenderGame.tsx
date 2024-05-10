@@ -4,30 +4,25 @@ import { PATH, ROOM_STATES } from '../../constants';
 import Timer from '../Timer';
 import { navigateTo } from '../../helpers';
 import ContainerTyping from './ContainerTypingRoom';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { TimeWriting } from 'src/type';
 import { ShowResult } from '../show-result';
 
 interface Props {
   handleSetPercentage: (value: number) => void;
-  refError: number;
-  refTimeTyping: TimeWriting;
-  handleMutableError: () => void;
 }
 
-export default function RenderGame({
-  handleSetPercentage,
-  refError,
-  refTimeTyping,
-  handleMutableError,
-}: Props) {
+export default function RenderGame({ handleSetPercentage }: Props) {
   const { roomState, room } = useContextRoom();
   const [showResult, setShowResult] = useState<boolean>(false);
+
+  const refError = useRef(0);
+  const refTimeTyping = useRef<TimeWriting>({ end: 0, start: 0 });
 
   useEffect(() => {
     if (roomState === ROOM_STATES.PLAYING) {
       setShowResult(false);
-      refTimeTyping.start = new Date().getTime();
+      refTimeTyping.current.start = new Date().getTime();
     }
   }, [roomState]);
 
@@ -41,9 +36,13 @@ export default function RenderGame({
   const _handleSetPercentage = (percentage: number) => {
     handleSetPercentage(percentage);
     if (percentage === 100) {
-      refTimeTyping.end = new Date().getTime();
+      refTimeTyping.current.end = new Date().getTime();
       setShowResult(true);
     }
+  };
+
+  const handleMutableError = () => {
+    refError.current++;
   };
 
   const RenderDic = {
@@ -71,9 +70,10 @@ export default function RenderGame({
               text={room.text}
               language={room.roomType}
               timeMilliseconds={
-                refTimeTyping.end - refTimeTyping.start
+                refTimeTyping.current.end -
+                refTimeTyping.current.start
               }
-              errors={refError}
+              errors={refError.current}
             />
           </div>
         )}
@@ -88,8 +88,10 @@ export default function RenderGame({
           <ShowResult
             text={room.text}
             language={room.roomType}
-            timeMilliseconds={refTimeTyping.end - refTimeTyping.start}
-            errors={refError}
+            timeMilliseconds={
+              refTimeTyping.current.end - refTimeTyping.current.start
+            }
+            errors={refError.current}
           />
         )}
         <ToggleButtonReady

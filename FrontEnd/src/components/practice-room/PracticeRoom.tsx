@@ -32,27 +32,18 @@ export default function PracticeRoom() {
   return (
     <section className={styles.container}>
       <BackToRooms className={styles.buttonBackRooms} />
-      <div>
-        <span>Progress</span>
-        <ProgressBar
-          style={{
-            height: '30px',
-            minWidth: '200px',
-            width: '400px',
-            display: 'inline-block',
-            verticalAlign: 'top',
-            marginLeft: '20px',
-          }}
-          pt={{
-            root: {
-              style: {
-                background: 'var(--gray-600)',
-              },
+
+      <ProgressBar
+        className={styles.progressBar}
+        pt={{
+          root: {
+            style: {
+              background: 'var(--gray-600)',
             },
-          }}
-          value={percentage}
-        />
-      </div>
+          },
+        }}
+        value={percentage}
+      />
 
       {roomType && (
         <ContainerTypingPractice

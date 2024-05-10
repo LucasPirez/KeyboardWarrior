@@ -5,3 +5,4 @@ export { type RoomStateType } from './room-states';
 export { type FinishGameData } from './finish-game';
 export { type RoomType } from './roomType';
 export { type TimeWriting } from './time-typing';
+export { type SessionStorageType } from './sessionStorage';

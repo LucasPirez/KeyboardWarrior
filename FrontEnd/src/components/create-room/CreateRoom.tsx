@@ -14,10 +14,12 @@ import { RoomType } from '../../type';
 
 import styles from './createRoom.module.css';
 import { DropDown } from './select-language';
+import { useErrorBoundary } from 'react-error-boundary';
 
 const { ROOM_NAME, ROOM_TYPE } = CREATE_ROOM_STATE;
 
 export function CreateRoom() {
+  const { showBoundary } = useErrorBoundary();
   const [roomValue, setRoomValue] = useState<RoomType>({
     [ROOM_NAME]: '',
     [ROOM_TYPE]: LANGUAGES.NORMAL_TEXT,
@@ -39,7 +41,7 @@ export function CreateRoom() {
         query: { id: response.data.id, userName },
       });
     } catch (error) {
-      alert(error);
+      showBoundary(error);
     }
   };
 

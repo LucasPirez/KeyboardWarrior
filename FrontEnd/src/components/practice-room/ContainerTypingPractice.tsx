@@ -62,6 +62,7 @@ export default function ContainerTypingPractice({
       setRoomState(SOCKET_MESSAGES.NOT_READY);
       refTimeWriting.current.end = new Date().getTime();
       setShowResult(true);
+      handleSetPercentage(0);
     }
   };
 

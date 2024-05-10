@@ -2,6 +2,7 @@ import { Button } from 'primereact/button';
 import { serviceGame } from '../../services';
 import { PATH, SESSION_STORAGE } from '../../constants';
 import { navigateTo } from '../../helpers';
+import ErrorComponent from '../error';
 
 interface Props {
   roomId?: string;
@@ -23,7 +24,7 @@ export function BackToRooms({ roomId, className }: Props) {
         throw new Error('Some error has ocurred');
       }
     } catch (error) {
-      alert(error);
+      return <ErrorComponent error={error} />;
     }
   };
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Login } from './components/login';
+import Login from './components/login';
 import { PATH, PathType } from './constants/paths';
 import { serviceGame } from './services';
 import Home from './components/Home';
@@ -10,6 +10,10 @@ import { Layout } from './components/Layout';
 import PracticeRoom from './components/practice-room/PracticeRoom';
 import NotFoundPage from './components/404-page';
 import ErrorComponent from './components/error';
+
+import { ErrorBoundary } from 'react-error-boundary';
+import { SESSION_STORAGE } from './constants';
+import { removeSessionStorage } from './helpers';
 
 function App() {
   const [currentPath, setCurrentPath] = useState<
@@ -24,14 +28,22 @@ function App() {
       setCurrentPath(PATH.login);
       return;
     }
+
+    try {
+      await login(userName);
+    } catch (error) {
+      removeSessionStorage(SESSION_STORAGE);
+
+      window.location.hash = PATH.login;
+      setCurrentPath(PATH.login);
+      return;
+    }
   };
 
   const handleSplitHash = (hash: string) => {
     if (!hash.includes('#/')) {
-      console.log('if este');
-
       window.location.hash = PATH.login;
-      return '/login';
+      return PATH.login;
     }
 
     return hash.split('?')[0].replace('#', '');
@@ -39,14 +51,14 @@ function App() {
 
   useEffect(() => {
     (async () => {
-      await handleAuth();
       const response = await serviceGame.connectGame();
 
       if (!response) {
         setCurrentPath(PATH.error);
         throw new Error('Error in socket connections');
       }
-      userName && (await login(userName));
+
+      await handleAuth();
 
       setCurrentPath(
         handleSplitHash(window.location.hash) as PathType
@@ -86,7 +98,11 @@ function App() {
       <NotFoundPage />
     );
 
-  return <Layout>{Component}</Layout>;
+  return (
+    <ErrorBoundary FallbackComponent={ErrorComponent}>
+      <Layout>{Component}</Layout>
+    </ErrorBoundary>
+  );
 }
 
 export default App;

@@ -4,26 +4,32 @@ import { useState } from 'react';
 import { PATH } from '../../constants/paths';
 import styles from './login.module.css';
 import { useLogin } from '../../hooks/useLogin';
+import ErrorComponent from '../error';
 
 export function Login() {
   const [value, setValue] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   const { login } = useLogin();
 
   const handleLogin = async () => {
     try {
+      setError(null);
+
       const result = await login(value);
 
       if (result) {
         window.location.hash = PATH.rooms;
       }
     } catch (error) {
-      console.log(error);
+      if (typeof error === 'string') setError(error);
+      else if (error instanceof Error) setError(error.message);
     }
   };
 
   return (
     <>
+      {error ? <ErrorComponent error={error} /> : ''}
       <InputText
         value={value}
         onChange={(e) => setValue(e.target.value)}

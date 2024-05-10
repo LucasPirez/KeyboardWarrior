@@ -12,7 +12,6 @@ const Char = memo(function Char({ char, press, symbol }: Props) {
 
   return (
     <div
-      key={String(char) + Math.random()}
       className={`${styles.keyContainer} ${
         !symbol
           ? `${styles[char as keyof typeof styles]}  ${

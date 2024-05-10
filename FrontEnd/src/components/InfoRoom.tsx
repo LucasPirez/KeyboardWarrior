@@ -8,26 +8,29 @@ import './infoRoom.scss';
 import JoinRoom from './rooms/JoinRoom';
 import { DIC_COLORS, ROOM_STATES } from '../constants';
 import { replaceObjectInArray } from '../helpers/replaceObjectInArray.helper';
-import { useLogin } from '../hooks/useLogin';
 import { useUser } from '../hooks/useUser';
 import { navigateTo } from '../helpers';
+import { useErrorBoundary } from 'react-error-boundary';
 
 export default function Room() {
+  const { showBoundary } = useErrorBoundary();
   const [rooms, setRooms] = useState<RoomType[]>([]);
-  const { login } = useLogin();
   const { userName } = useUser();
 
   useEffect(() => {
-    if (!userName) {
-      navigateTo({
-        path: '/login',
-      });
-      return;
-    }
-    login(userName);
     (async () => {
-      const getRooms = await serviceGame.getRooms();
-      setRooms(getRooms?.data ?? []);
+      if (!userName) {
+        navigateTo({
+          path: '/login',
+        });
+        return;
+      }
+      try {
+        const getRooms = await serviceGame.getRooms();
+        setRooms(getRooms?.data ?? []);
+      } catch (error) {
+        showBoundary(error);
+      }
     })();
   }, []);
 

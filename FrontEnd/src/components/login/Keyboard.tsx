@@ -20,6 +20,7 @@ export default function Keyboard({ activeKey }: Props) {
             char={char}
             press={activeKey[uniqueKey as string]}
             symbol={symbol}
+            key={char + Math.random()}
           />
         );
       })}

@@ -1,21 +1,29 @@
 import { Toast } from 'primereact/toast';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 interface Props {
-  message?: string;
+  error?: unknown;
 }
 
-export default function Error({ message }: Props) {
+export default function ErrorComponent({ error }: Props) {
   const toast = useRef<Toast>(null);
+  console.log(error);
 
-  setTimeout(() => {
+  const message =
+    typeof error === 'string'
+      ? error
+      : error instanceof Error
+      ? error.message
+      : 'Some error has ocurred.';
+
+  useEffect(() => {
     toast.current?.show({
       severity: 'error',
       summary: 'Error',
-      detail: message ?? 'Some error has ocurred.',
+      detail: <strong>{message}</strong>,
       life: 3000,
     });
-  }, 200);
+  }, []);
 
   return (
     <>
