@@ -43,15 +43,14 @@ export default function ContainerTypingPractice({
 
   useEffect(() => {
     (async () => {
-      const response = await serviceGame.getTextPractice(roomType);
+      try {
+        const response = await serviceGame.getTextPractice(roomType);
 
-      if (!response?.data)
-        throw new Error(
-          'some error has ocurred, in receive text practice room'
-        );
-
-      setText(response?.data);
-      handleSetPercentage(0);
+        setText(response);
+        handleSetPercentage(0);
+      } catch (error) {
+        alert(error);
+      }
     })();
   }, []);
 

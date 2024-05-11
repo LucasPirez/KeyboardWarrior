@@ -63,7 +63,7 @@ export default function ContainerTyping({
       finish={handleFinish}
       inactiveUser={handleInactiveUser}
       intervalPercentage={handleIntervalPercentage}
-      isInactive={860}
+      isInactive={30}
       handleError={handleError}
     />
   );

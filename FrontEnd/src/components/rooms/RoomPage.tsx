@@ -9,8 +9,6 @@ import { SOCKET_MESSAGES } from '../../constants/socket-messages';
 import RenderGame from './RenderGame';
 import TablePosition from './TablePosition';
 
-import { useErrorBoundary } from 'react-error-boundary';
-
 import styles from './roomPage.module.css';
 import { useUser } from '../../hooks/useUser';
 import { navigateTo } from '../../helpers';
@@ -18,7 +16,6 @@ import { navigateTo } from '../../helpers';
 export default function RoomPage() {
   const [percentage, setPercentage] = useState(0);
   const { userName } = useUser();
-  const { showBoundary } = useErrorBoundary();
 
   const refIds = useRef<
     { id: string; userName: string } | undefined
@@ -59,7 +56,9 @@ export default function RoomPage() {
           handleSetRoom(getRoom.data);
         }
       } catch (error) {
-        showBoundary(error);
+        navigateTo({
+          path: PATH.rooms,
+        });
       }
 
       await serviceGame.listen(SOCKET_MESSAGES.ROOM_DATA, (data) => {

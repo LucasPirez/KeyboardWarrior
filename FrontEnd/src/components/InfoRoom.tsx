@@ -102,6 +102,9 @@ export default function Room() {
             opacity: `${
               room.state === ROOM_STATES.PLAYING ? 0.6 : ''
             }`,
+            maxWidth: '220px',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
           }}
           title={room.name}
           className={`card`}>

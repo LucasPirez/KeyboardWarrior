@@ -3,12 +3,12 @@ import { urlSocket } from '../constants/url-socket';
 import { SocketResponse } from '../type/socket-response';
 
 abstract class SignalRManager {
-  private server: signalR.HubConnectionBuilder =
-    new signalR.HubConnectionBuilder();
   private hub1: signalR.HubConnection | null = null;
 
   protected async connect(path: string = '/Play'): Promise<boolean> {
-    this.hub1 = this.server.withUrl(`${urlSocket}${path}`).build();
+    this.hub1 = new signalR.HubConnectionBuilder()
+      .withUrl(`${urlSocket}${path}`)
+      .build();
 
     try {
       await this.hub1.start();
@@ -19,7 +19,9 @@ abstract class SignalRManager {
 
       return true;
     } catch (error) {
-      alert(`Error connect to server, ${urlSocket}: ${error}`);
+      alert(
+        `Error connecting to the server, please try again later.`
+      );
       return false;
     }
   }
