@@ -21,7 +21,7 @@ namespace keyboard_warrior.Services
             
             if (user == null) return (null, false);
              await  _stateUsers.RemoveUser(user.UserName);
-          
+
              Room room = await _roomsState.RemoveUser(user);
              var roomDTO = room.GetRoomDTO();
              int usersCount = room.GetUsersCount();

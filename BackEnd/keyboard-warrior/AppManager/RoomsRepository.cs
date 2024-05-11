@@ -79,10 +79,10 @@ namespace keyboard_warrior.AppManager
 
         public  async Task<Room> RemoveUser(UserConnection user)
         {
-            var currentRoom =  rooms.Values.FirstOrDefault(u => u.GetUsers().Contains(user));
+            var currentRoom =  rooms.Values.FirstOrDefault(u => u.GetUsers().Contains(user)) 
+                ?? throw new Exception($"User not found in any room in method {nameof(RemoveUser)}");
 
-            if (currentRoom == null) throw new Exception($"User not found in any room in method {nameof(RemoveUser)}");
-               currentRoom.RemoveUser(user);
+            currentRoom.RemoveUser(user);
  
                return  currentRoom;
         }

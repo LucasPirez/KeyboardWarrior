@@ -93,8 +93,8 @@ namespace keyboard_warrior.Hubs
          
                 await Groups.AddToGroupAsync(Context.ConnectionId, roomDTO.Id);
                 await _clientHubServices.CreateRoom(roomDTO);
-             
-                return response.Send((int)HttpStatusCode.OK, ResponseMessages.RoomCreated, roomDTO);
+
+          return response.Send((int)HttpStatusCode.OK, ResponseMessages.RoomCreated, roomDTO);
             }
             catch (MyException e)
             {
@@ -160,6 +160,7 @@ namespace keyboard_warrior.Hubs
 
         public async Task<SocketResponseDTO<bool>> RemoveUserRoom(string roomId, string userName)
         {
+            Console.WriteLine("countetadoro");
             try
             {
                 var room = await _gameHubServices.RemoveUserRoom(roomId, userName);
@@ -270,7 +271,7 @@ namespace keyboard_warrior.Hubs
             {
             var text = await _gameHubServices.GetPracticeText(roomTextType);
 
-            return    response.Send((int)HttpStatusCode.OK, "Text receive", text);
+            return  response.Send((int)HttpStatusCode.OK, "Text receive", text);
 
             }
             catch(MyException ex)

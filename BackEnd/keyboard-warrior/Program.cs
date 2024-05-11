@@ -12,7 +12,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy",
-        builder => builder.WithOrigins(["http://192.168.0.14", "http://localhost"])
+        builder => builder.WithOrigins("http://192.168.0.13:5173", "http://localhost:5173")
         .AllowAnyMethod()
         .AllowAnyHeader()
         .AllowCredentials());
@@ -21,7 +21,8 @@ builder.Services.AddCors(options =>
 builder.Services.AddSingleton<IRoomsRepository, RoomsRepository>();
 builder.Services.AddSingleton<IUsersRepository, UsersRepository>();
 
-builder.Services.AddScoped<IGameHubServices, GameHubServices>();
+builder.Services.AddScoped<IGameServices, GameServices>();
+builder.Services.AddScoped<IClientHubMessagesService, ClientHubServices>();
 
 
 var app = builder.Build();
@@ -34,18 +35,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
-
-
-app.UseRouting();
-
 app.UseCors("CorsPolicy");
-
-app.UseAuthorization();
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.MapHub<GameHub>("/Play");
 

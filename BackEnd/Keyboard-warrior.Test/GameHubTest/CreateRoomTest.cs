@@ -81,31 +81,33 @@ namespace Keyboard_warrior.Test.GameHubTest
             string connectionId = "connectionId";
 
 
-            var mockGameHubServices = new Mock<IGameHubServices>();
+            var mockGameHubServices = new Mock<IGameServices>();
             var mockLogger = new Mock<ILogger<GameHub>>();
             var mockGroupManager = new Mock<IGroupManager>();
             var mockClients = new Mock<IHubCallerClients>();
+            var mockClientService = new Mock<IClientHubMessagesService>();
 
             var context = new Mock<HubCallerContext>();
             context.Setup(c => c.ConnectionId).Returns(connectionId);
 
             mockGameHubServices.Setup(s => s.CreateRoom(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(roomDTO);
+            
 
-            var gameHub = new GameHub(mockGameHubServices.Object, mockLogger.Object)
+            var gameHub = new GameHub(mockGameHubServices.Object, mockLogger.Object, mockClientService.Object)
             {
                 Clients = mockClients.Object,
                 Groups = mockGroupManager.Object,
                 Context = context.Object
+
             };
 
             // Act
             var result = await gameHub.CreateRoom("userName", roomDTO.Name, roomDTO.RoomType);
 
             // Assert
-            mockGameHubServices.Verify(s => s.CreateRoom("userName", roomDTO.Name, roomDTO.RoomType) , Moq.Times.Once);
-            mockGroupManager.Verify(g => g.AddToGroupAsync(connectionId, roomDTO.Id,default),Times.Once);
-            mockClients.Verify(c => c.All, Times.Once);
-
+            mockGameHubServices.Verify(s => s.CreateRoom("userName", roomDTO.Name, roomDTO.RoomType), Moq.Times.Once);
+            mockGroupManager.Verify(g => g.AddToGroupAsync(connectionId, roomDTO.Id, default), Times.Once);
+            mockClientService.Verify(c => c.CreateRoom(roomDTO), Times.Once);
         }
     }
 }

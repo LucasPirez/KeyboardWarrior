@@ -11,7 +11,7 @@
 
             public const string LoginSucces = "User Created";
 
-            public const string NotJoinRoomWhenIsPlaying = "You can't in to room when it's playing";
+            public const string NotJoinRoomWhenIsPlaying = "You can't in to room or reload room page when it's playing";
 
             public const string JoinRoomSuccess = "User add with exist";
 
