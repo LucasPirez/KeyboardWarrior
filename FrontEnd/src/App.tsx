@@ -13,7 +13,7 @@ import ErrorComponent from './components/error';
 
 import { ErrorBoundary } from 'react-error-boundary';
 import { SESSION_STORAGE } from './constants';
-import { removeSessionStorage } from './helpers';
+import { removeSessionStorage, splitHashHelper } from './helpers';
 
 function App() {
   const [currentPath, setCurrentPath] = useState<
@@ -40,15 +40,6 @@ function App() {
     }
   };
 
-  const handleSplitHash = (hash: string) => {
-    if (!hash.includes('#/')) {
-      window.location.hash = PATH.login;
-      return PATH.login;
-    }
-
-    return hash.split('?')[0].replace('#', '');
-  };
-
   useEffect(() => {
     (async () => {
       const response = await serviceGame.connectGame();
@@ -61,7 +52,7 @@ function App() {
       await handleAuth();
 
       setCurrentPath(
-        handleSplitHash(window.location.hash) as PathType
+        splitHashHelper(window.location.hash) as PathType
       );
     })();
 
@@ -73,7 +64,7 @@ function App() {
   useEffect(() => {
     const handleLocationChange = () => {
       setCurrentPath(
-        handleSplitHash(window.location.hash) as PathType
+        splitHashHelper(window.location.hash) as PathType
       );
     };
     window.addEventListener('popstate', handleLocationChange);
@@ -91,12 +82,12 @@ function App() {
     [PATH.error]: <ErrorComponent />,
   };
 
-  const Component =
-    currentPath && pageToRender[currentPath] ? (
+  const Component = (currentPath &&
+    (pageToRender[currentPath] ? (
       pageToRender[currentPath]
     ) : (
       <NotFoundPage />
-    );
+    ))) ?? <>{''}</>;
 
   return (
     <ErrorBoundary FallbackComponent={ErrorComponent}>

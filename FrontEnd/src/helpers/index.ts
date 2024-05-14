@@ -7,3 +7,4 @@ export {
   removeSessionStorage,
   setSessionStorage,
 } from './sessionStorage.helper';
+export { splitHashHelper } from './splitHash.helper';
