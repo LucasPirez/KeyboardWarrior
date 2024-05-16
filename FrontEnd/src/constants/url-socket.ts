@@ -1,1 +1,1 @@
-export const urlSocket = import.meta.env.VITE_APP_SOCKET;
+export const urlSocket = process.env.VITE_APP_SOCKET;
