@@ -34,7 +34,7 @@ export default function LoginPage() {
         newAudio.play();
       }
     }
-  }, [activeChar]);
+  }, [activeChar, userName]);
 
   return (
     <section className={styles.container}>

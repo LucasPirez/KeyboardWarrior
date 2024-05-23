@@ -10,7 +10,7 @@ interface Props {
 export default function Keyboard({ activeKey }: Props) {
   return (
     <div className={styles.container}>
-      {keyboardLetters.map((uniqueKey) => {
+      {keyboardLetters.map((uniqueKey, index) => {
         const char =
           typeof uniqueKey === 'string' ? uniqueKey : uniqueKey[0];
         const symbol =
@@ -20,7 +20,7 @@ export default function Keyboard({ activeKey }: Props) {
             char={char}
             press={activeKey[uniqueKey as string]}
             symbol={symbol}
-            key={char + Math.random()}
+            key={char + index}
           />
         );
       })}

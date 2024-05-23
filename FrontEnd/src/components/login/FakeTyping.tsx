@@ -36,7 +36,7 @@ export default function FakeTyping({
         setActiveChar({ ['null']: true });
       })();
     }, 1000);
-  }, []);
+  }, []); // eslint-disable-line
 
   return (
     <>
