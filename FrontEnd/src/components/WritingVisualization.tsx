@@ -34,7 +34,9 @@ export default function WritingVisualization({
   });
 
   const refPercentage = useRef<{ value: number }>({ value: 0 });
-  const refInterval = useRef<{ value: number }>({ value: 0 });
+  const refInterval = useRef<{ value: NodeJS.Timeout | null }>({
+    value: null,
+  });
   const userInteraction = useRef<{
     lastIndexTyped: number;
     seconds: number;
@@ -110,7 +112,8 @@ export default function WritingVisualization({
           intervalPercentage(refPercentage?.current.value ?? 0);
 
         if (refPercentage?.current.value === 100) {
-          clearInterval(refInterval.current.value);
+          refInterval?.current?.value &&
+            clearInterval(refInterval?.current.value);
 
           finish?.();
         }
@@ -142,7 +145,8 @@ export default function WritingVisualization({
       }, 1000);
 
     return () => {
-      clearInterval(refInterval.current.value);
+      refInterval?.current?.value &&
+        clearInterval(refInterval?.current.value);
     };
   }, []);
 

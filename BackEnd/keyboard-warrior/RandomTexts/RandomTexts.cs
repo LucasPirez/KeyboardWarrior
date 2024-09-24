@@ -27,7 +27,7 @@ namespace keyboard_warrior.Texts
 
             javascriptTexts.Add("function sum(a,b){\n   return a + b;\n }");
             javascriptTexts.Add("function getRandomNumber(min,max){\n  const num = Math.random() * max;\n  return min + Math.round(num);\n }");
-
+            javascriptTexts.Add("function factorial(n){\n   if(n === 0){\n   return 1;\n   }\n return n * factorial(n - 1);\n}");
         }
 
         public string GetRandomText(RoomTextType typeText)

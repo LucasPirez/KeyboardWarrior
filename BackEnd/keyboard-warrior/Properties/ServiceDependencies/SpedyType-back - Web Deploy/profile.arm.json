@@ -21,7 +21,7 @@
     },
     "resourceName": {
       "type": "string",
-      "defaultValue": "SpeedyType",
+      "defaultValue": "SpedyType-back",
       "metadata": {
         "description": "Name of the main resource to be created by this template."
       }
