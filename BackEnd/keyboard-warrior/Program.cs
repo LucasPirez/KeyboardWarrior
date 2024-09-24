@@ -12,7 +12,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy",
-        builder => builder.WithOrigins("https://speedytype-gamma.vercel.app")
+        builder => builder.WithOrigins("https://speedytype-gamma.vercel.app", "http://localhost:5173")
         .AllowAnyMethod()
         .AllowAnyHeader()
         .AllowCredentials());
