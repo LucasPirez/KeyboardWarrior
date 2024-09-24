@@ -1,13 +1,22 @@
 ﻿using keyboard_warrior.enums;
+using Microsoft.AspNet.SignalR.Infrastructure;
 
 namespace keyboard_warrior.Models
 {
-    public class UserConnection(string id, string userName,string connectionId)
+    public class UserConnection
     {
-        public string Id { get; private set; } = id;
-        public string ConnectionId { get; private set; } = connectionId;
-        public string UserName { get; private set; } = userName;
         public bool Ready { get; private set; } = false;
+
+        public string Id { get; private set; } 
+        public string ConnectionId { get; private set; } 
+        public string UserName { get; private set; } 
+
+        public UserConnection(string id, string userName, string connectionId)
+        {
+         Id = id;
+         ConnectionId  = connectionId;
+         UserName  = userName;
+        }
 
         public void SetReady(bool ready)
         {

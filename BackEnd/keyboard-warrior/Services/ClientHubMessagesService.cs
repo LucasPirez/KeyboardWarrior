@@ -5,9 +5,14 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace keyboard_warrior.Services
 {
-    public class ClientHubServices(IHubContext<GameHub> hubContext):IClientHubMessagesService
+    public class ClientHubServices:IClientHubMessagesService
     {
-        private readonly IHubContext<GameHub> _hubContext = hubContext;
+        private readonly IHubContext<GameHub> _hubContext;
+
+        public ClientHubServices(IHubContext<GameHub> hubContext)
+        {
+            _hubContext = hubContext;
+        }
 
         public async Task SendRoomData(string roomId, string connectionId, RoomDTO data)
         {

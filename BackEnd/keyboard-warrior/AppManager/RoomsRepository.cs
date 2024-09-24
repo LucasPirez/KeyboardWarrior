@@ -7,10 +7,14 @@ using System.Net;
 
 namespace keyboard_warrior.AppManager
 {
-    public class RoomsRepository(IUsersRepository users) : IRoomsRepository
+    public class RoomsRepository: IRoomsRepository
     {
+        private readonly IUsersRepository _users;
         private ConcurrentDictionary<string, Room> rooms = new();
-        private readonly IUsersRepository _users = users;
+        public RoomsRepository(IUsersRepository users)
+        {
+            _users = users;
+        }
 
         public async Task<IEnumerable<RoomDTO>> GetRooms()
         {

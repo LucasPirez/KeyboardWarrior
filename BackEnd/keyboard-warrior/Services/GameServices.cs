@@ -9,12 +9,18 @@ using System.Net;
 
 namespace keyboard_warrior.Services
 {
-    public class GameServices(IUsersRepository stateUsers,
-        IRoomsRepository roomsState) : IGameServices 
+    public class GameServices : IGameServices 
     {
-        private IUsersRepository _stateUsers = stateUsers;
-        private IRoomsRepository _roomsState = roomsState;
+        private readonly IUsersRepository _stateUsers;
+        private readonly IRoomsRepository _roomsState;
       
+
+        public GameServices(IUsersRepository stateUsers,
+        IRoomsRepository roomsState)
+        {
+            _stateUsers = stateUsers;
+            _roomsState = roomsState;
+        }
         public async Task<(Room?,bool)> OnDisconected(string connectionId)
         {
             var user = await _stateUsers.GetUserByConnectionId(connectionId);

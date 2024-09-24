@@ -5,18 +5,26 @@ using keyboard_warrior.Messages;
 using keyboard_warrior.Models;
 using keyboard_warrior.Services;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Logging;
 using System.Net;
 
 
 namespace keyboard_warrior.Hubs
 {
-    public class GameHub(IGameServices gameHubServices,ILogger<GameHub> logger,IClientHubMessagesService 
-       clientHubServices ) : Hub
+    public class GameHub : Hub
     {
-        private readonly IGameServices _gameHubServices = gameHubServices;
-        private readonly ILogger<GameHub> _logger = logger;
-        private readonly IClientHubMessagesService _clientHubServices = clientHubServices;
+        private readonly IGameServices _gameHubServices;
+        private readonly ILogger<GameHub> _logger;
+        private readonly IClientHubMessagesService _clientHubServices;
 
+
+        public GameHub(IGameServices gameHubServices, ILogger<GameHub> logger, IClientHubMessagesService
+       clientHubServices)
+        {
+            _gameHubServices = gameHubServices;
+            _logger = logger;
+            _clientHubServices = clientHubServices;
+        }
         public override async Task OnConnectedAsync()
         {
             await Clients.Caller.SendAsync("ClientConnected", "¡Bienvenido! Estás conectado al servidor.");
