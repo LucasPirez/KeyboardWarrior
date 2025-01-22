@@ -21,8 +21,8 @@ jobs:
       with:
         dotnet-version: 8.0.x
     - name: Restore dependencies
-      run: dotnet restore BackEnd/Keyboard-warrior.sln
+      run: dotnet restore BackEnd/keyboard-warrior.sln
     - name: Build 
-      run: dotnet build BackEnd/Keyboard-warrior.sln --no-restore
+      run: dotnet build BackEnd/keyboard-warrior.sln --no-restore
     - name: Test
-      run: dotnet test BackEnd/Keyboard-warrior.sln --no-build --verbosity normal
+      run: dotnet test BackEnd/keyboard-warrior.sln --no-build --verbosity normal
