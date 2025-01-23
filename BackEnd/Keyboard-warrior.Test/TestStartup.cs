@@ -15,7 +15,7 @@ namespace Keyboard_warrior.Test
             {
                 /*   var handler = provider.GetRequiredService<HttpMessageHandler>();*/
                 var connection = new HubConnectionBuilder()
-                    .WithUrl("https://localhost:7088/Play", o =>
+                    .WithUrl("http://localhost:5110/Play", o =>
                     {
                         o.Headers.Add("Access-Control-Allow-Origin", "*");
                     })
