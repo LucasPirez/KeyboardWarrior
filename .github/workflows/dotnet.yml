@@ -24,5 +24,15 @@ jobs:
       run: dotnet restore BackEnd/keyboard-warrior.sln
     - name: Build 
       run: dotnet build BackEnd/keyboard-warrior.sln --no-restore
+
+    - name: Start application
+      run: dotnet run --project BackEnd/keyboard-warrior.csproj # Asegúrate de que el puerto coincida con tus pruebas
+
+    # 6. Esperar que la aplicación inicie
+    - name: Wait for application to start
+      run: |
+        echo "Waiting for app to start..."
+        sleep 10  # Ajusta el tiempo si tu app tarda más en arrancar
+        
     - name: Test
       run: dotnet test BackEnd/keyboard-warrior.sln --no-build --verbosity normal
