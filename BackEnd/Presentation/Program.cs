@@ -1,9 +1,12 @@
-using keyboard_warrior.AppManager;
-using keyboard_warrior.Presentation.Hubs;
+using Application;
+using Infrastructure;
+using Presentation;
+using Presentation.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
 builder.Services.AddLogging();
 builder.Services.AddSignalR();
 builder.Services.AddControllersWithViews();
@@ -21,17 +24,27 @@ builder.Services.AddCors(options =>
     );
 });
 
+builder.Services.AddApplication();
+builder.Services.AddInfrastructure();
 
+builder.Services.AddScoped<IClientHubMessages, ClientHubMessages>();
+
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+//builder.Services.AddEndpointsApiExplorer();
+//builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+    //app.UseSwagger();
+    //app.UseSwaggerUI();
 }
+
+app.UseHttpsRedirection();
+
+app.UseAuthorization();
 
 app.UseCors("CorsPolicy");
 

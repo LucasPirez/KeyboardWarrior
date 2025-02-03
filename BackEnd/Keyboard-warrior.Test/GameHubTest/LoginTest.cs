@@ -1,10 +1,9 @@
-using keyboard_warrior.DTOs;
-using keyboard_warrior.Hubs;
+using System.Net;
+using keyboard_warrior.Application.DTOs;
 using keyboard_warrior.Messages;
+using keyboard_warrior.Presentation.Hubs;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
-using System.Net;
-
 
 namespace Keyboard_warrior.Test.GameHubTest
 {
@@ -17,32 +16,39 @@ namespace Keyboard_warrior.Test.GameHubTest
 
         public LoginTest(TestStartup fixture)
         {
-            _connection = fixture.Services.BuildServiceProvider().GetRequiredService<HubConnection>();
-            _secondConnection = fixture.Services.BuildServiceProvider().GetRequiredService<HubConnection>();
-
+            _connection = fixture
+                .Services.BuildServiceProvider()
+                .GetRequiredService<HubConnection>();
+            _secondConnection = fixture
+                .Services.BuildServiceProvider()
+                .GetRequiredService<HubConnection>();
         }
-
 
         [Fact]
         public async Task LoginUser_ReturnsOkStatus()
         {
             string message = "user1";
-            var response = await _connection.InvokeAsync<SocketResponseDTO<UserDTO>>(_methodName, message);
+            var response = await _connection.InvokeAsync<SocketResponseDTO<UserDTO>>(
+                _methodName,
+                message
+            );
 
-            Assert.Equal((int)HttpStatusCode.OK,response.Code);
-            Assert.Equal(ResponseMessages.LoginSucces,response.Message);
-            Assert.Equal(message,response.Data?.UserName);
-
+            Assert.Equal((int)HttpStatusCode.OK, response.Code);
+            Assert.Equal(ResponseMessages.LoginSucces, response.Message);
+            Assert.Equal(message, response.Data?.UserName);
         }
 
         [Fact]
         public async Task LoginDuplicatedUserName_Returns409Status()
-        {  
+        {
             string message = "user2";
             await _secondConnection.InvokeAsync(_methodName, message);
 
-            var response = await _connection.InvokeAsync<SocketResponseDTO<UserDTO>>(_methodName, message);
-            
+            var response = await _connection.InvokeAsync<SocketResponseDTO<UserDTO>>(
+                _methodName,
+                message
+            );
+
             Assert.Equal((int)HttpStatusCode.Conflict, response.Code);
             Assert.Equal(ResponseMessages.UserNameExist, response.Message);
             Assert.Null(response.Data);
