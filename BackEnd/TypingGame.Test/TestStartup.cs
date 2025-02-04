@@ -1,8 +1,7 @@
-﻿using keyboard_warrior.Models;
-using Microsoft.AspNetCore.SignalR.Client;
+﻿using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Keyboard_warrior.Test
+namespace TypingGame.Test
 {
     public class TestStartup
     {

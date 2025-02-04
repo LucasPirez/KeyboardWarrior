@@ -1,12 +1,12 @@
-﻿using keyboard_warrior.Application.DTOs;
-using keyboard_warrior.AppManager;
-using keyboard_warrior.Messages;
-using keyboard_warrior.Presentation.Hubs;
+﻿using Application.DTOs;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
+using TypingGame.Presentation.Hubs;
+using TypingGame.Shared.Constants.Messages;
+using TypingGame.Test;
 using Xunit.Abstractions;
 
-namespace Keyboard_warrior.Test.GameHubTest
+namespace TypingGame.Test.GameHubTest
 {
     [Collection("IntegrationTest")]
     public class RemoveUserInRoom

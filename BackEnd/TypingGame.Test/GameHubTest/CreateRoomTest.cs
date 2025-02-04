@@ -1,18 +1,20 @@
 ﻿using System.Net;
-using keyboard_warrior.Application.DTOs;
-using keyboard_warrior.AppManager;
-using keyboard_warrior.Domain.enums;
-using keyboard_warrior.Infrastructure.Services;
-using keyboard_warrior.Messages;
-using keyboard_warrior.Presentation.Hubs;
+using Application.DTOs;
+using Application.Extensions;
+using Application.Interfaces;
+using Domain.Entities;
+using Domain.enums;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
+using TypingGame.Presentation;
+using TypingGame.Presentation.Hubs;
+using TypingGame.Shared.Constants.Messages;
 using Xunit.Abstractions;
 
-namespace Keyboard_warrior.Test.GameHubTest
+namespace TypingGame.Test.GameHubTest
 {
     [Collection("IntegrationTest")]
     public class CreateRoomTest
@@ -87,15 +89,14 @@ namespace Keyboard_warrior.Test.GameHubTest
         [Fact]
         public async Task CreateRoom_SendsMessagesToAllClients()
         {
-            Room room = new("roomName", RoomTextType.Javascript.ToString());
-            var roomDTO = room.GetRoomDTO();
+            Room room = new Room("roomName", RoomTextType.Javascript.ToString());
+            var roomDTO = room.AsDto();
             string connectionId = "connectionId";
-
             var mockGameHubServices = new Mock<IGameServices>();
             var mockLogger = new Mock<ILogger<GameHub>>();
             var mockGroupManager = new Mock<IGroupManager>();
             var mockClients = new Mock<IHubCallerClients>();
-            var mockClientService = new Mock<IClientHubMessagesService>();
+            var mockClientService = new Mock<IClientHubMessages>();
 
             var context = new Mock<HubCallerContext>();
             context.Setup(c => c.ConnectionId).Returns(connectionId);
@@ -123,7 +124,7 @@ namespace Keyboard_warrior.Test.GameHubTest
             // Assert
             mockGameHubServices.Verify(
                 s => s.CreateRoom("userName", roomDTO.Name, roomDTO.RoomType),
-                Moq.Times.Once
+                Times.Once
             );
             mockGroupManager.Verify(
                 g => g.AddToGroupAsync(connectionId, roomDTO.Id, default),

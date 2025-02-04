@@ -1,9 +1,9 @@
-﻿using keyboard_warrior.Application.DTOs;
-using keyboard_warrior.Domain.enums;
-using keyboard_warrior.Presentation.Hubs;
+﻿using Application.DTOs;
+using Domain.enums;
 using Microsoft.AspNetCore.SignalR.Client;
+using TypingGame.Presentation.Hubs;
 
-namespace Keyboard_warrior.Test
+namespace TypingGame.Test
 {
     public class Utils
     {

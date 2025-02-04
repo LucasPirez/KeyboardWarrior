@@ -1,13 +1,13 @@
 ﻿using System.Net;
-using keyboard_warrior.Application.DTOs;
-using keyboard_warrior.Domain.enums;
-using keyboard_warrior.Messages;
-using keyboard_warrior.Presentation.Hubs;
+using Application.DTOs;
+using Domain.enums;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
+using TypingGame.Presentation.Hubs;
+using TypingGame.Shared.Constants.Messages;
 using Xunit.Abstractions;
 
-namespace Keyboard_warrior.Test.GameHubTest
+namespace TypingGame.Test.GameHubTest
 {
     [Collection("IntegrationTest")]
     public class JoinRoomTest
