@@ -28,7 +28,7 @@ jobs:
       run: dotnet build $ROUTE_ENV --no-restore
 
     - name: Start application
-      run: dotnet run  --project $ROUTE_ENV/TypingGame.csproj & 
+      run: dotnet run  --project BackEnd/TypingGame.Presentation/TypingGame.Presentation.csproj & 
 
   
     - name: Wait for application to start
