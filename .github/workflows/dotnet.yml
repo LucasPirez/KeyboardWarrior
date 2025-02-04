@@ -13,6 +13,8 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    env:
+      ROUTE_ENV: BackEnd/TypingGame.sln
 
     steps:
     - uses: actions/checkout@v4
@@ -21,12 +23,12 @@ jobs:
       with:
         dotnet-version: 8.0.x
     - name: Restore dependencies
-      run: dotnet restore BackEnd/keyboard-warrior.sln
+      run: dotnet restore $ROUTE_ENV
     - name: Build 
-      run: dotnet build BackEnd/keyboard-warrior.sln --no-restore
+      run: dotnet build $ROUTE_ENV --no-restore
 
     - name: Start application
-      run: dotnet run  --project BackEnd/keyboard-warrior/keyboard-warrior.csproj & 
+      run: dotnet run  --project $ROUTE_ENV/TypingGame.csproj & 
 
   
     - name: Wait for application to start
@@ -35,4 +37,4 @@ jobs:
         sleep 10  # Ajusta el tiempo si tu app tarda más en arrancar
         
     - name: Test
-      run: dotnet test BackEnd/keyboard-warrior.sln --no-build --verbosity normal
+      run: dotnet test $ROUTE_ENV --no-build --verbosity normal
