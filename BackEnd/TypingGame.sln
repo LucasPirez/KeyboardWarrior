@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34511.84
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypingGame.Test", "TypingGame.Test\TypingGame.Test.csproj", "{1E38F405-0F06-40AA-960A-3FB1E0901248}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypingGame.Domain", "TypingGame.Domain\TypingGame.Domain.csproj", "{5A9F4EFD-3DC0-44C5-BA94-7B0F8AE7BE47}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypingGame.Infrastructure", "TypingGame.Infrastructure\TypingGame.Infrastructure.csproj", "{03A862E2-E321-4B57-9F8C-D81BCD660312}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypingGame.Application", "TypingGame.Application\TypingGame.Application.csproj", "{4232F7E5-BE8C-4BD7-BAA3-D22B23EFCEC8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypingGame.Presentation", "TypingGame.Presentation\TypingGame.Presentation.csproj", "{7A6CA143-65BD-4087-B910-E97E819D37A5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypingGame.Shared", "TypingGame.Shared\TypingGame.Shared.csproj", "{65733117-00EE-4AB2-BAE1-8A1185C93F12}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1E38F405-0F06-40AA-960A-3FB1E0901248}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E38F405-0F06-40AA-960A-3FB1E0901248}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E38F405-0F06-40AA-960A-3FB1E0901248}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E38F405-0F06-40AA-960A-3FB1E0901248}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A9F4EFD-3DC0-44C5-BA94-7B0F8AE7BE47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A9F4EFD-3DC0-44C5-BA94-7B0F8AE7BE47}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A9F4EFD-3DC0-44C5-BA94-7B0F8AE7BE47}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A9F4EFD-3DC0-44C5-BA94-7B0F8AE7BE47}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03A862E2-E321-4B57-9F8C-D81BCD660312}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03A862E2-E321-4B57-9F8C-D81BCD660312}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03A862E2-E321-4B57-9F8C-D81BCD660312}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03A862E2-E321-4B57-9F8C-D81BCD660312}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4232F7E5-BE8C-4BD7-BAA3-D22B23EFCEC8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4232F7E5-BE8C-4BD7-BAA3-D22B23EFCEC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4232F7E5-BE8C-4BD7-BAA3-D22B23EFCEC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4232F7E5-BE8C-4BD7-BAA3-D22B23EFCEC8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A6CA143-65BD-4087-B910-E97E819D37A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A6CA143-65BD-4087-B910-E97E819D37A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A6CA143-65BD-4087-B910-E97E819D37A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A6CA143-65BD-4087-B910-E97E819D37A5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65733117-00EE-4AB2-BAE1-8A1185C93F12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65733117-00EE-4AB2-BAE1-8A1185C93F12}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65733117-00EE-4AB2-BAE1-8A1185C93F12}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65733117-00EE-4AB2-BAE1-8A1185C93F12}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4A9A8F90-9235-4DFA-BA5F-74BA80290D6C}
+	EndGlobalSection
+EndGlobal
