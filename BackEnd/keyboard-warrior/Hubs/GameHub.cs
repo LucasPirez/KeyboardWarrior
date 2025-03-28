@@ -1,13 +1,14 @@
-﻿using keyboard_warrior.AppManager;
+﻿using System.Net;
+using keyboard_warrior.AppManager;
 using keyboard_warrior.DTOs;
 using keyboard_warrior.Exceptions;
 using keyboard_warrior.Messages;
 using keyboard_warrior.Models;
+using keyboard_warrior.Notifications;
+using keyboard_warrior.Notifications.Interfaces;
 using keyboard_warrior.Services;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
-using System.Net;
-
 
 namespace keyboard_warrior.Hubs
 {
@@ -16,54 +17,64 @@ namespace keyboard_warrior.Hubs
         private readonly IGameServices _gameHubServices;
         private readonly ILogger<GameHub> _logger;
         private readonly IClientHubMessagesService _clientHubServices;
+        private readonly INotificationService _notificationService;
 
-
-        public GameHub(IGameServices gameHubServices, ILogger<GameHub> logger, IClientHubMessagesService
-       clientHubServices)
+        public GameHub(
+            IGameServices gameHubServices,
+            ILogger<GameHub> logger,
+            IClientHubMessagesService clientHubServices,
+            INotificationService notificationService
+        )
         {
             _gameHubServices = gameHubServices;
             _logger = logger;
             _clientHubServices = clientHubServices;
+            _notificationService = notificationService;
         }
+
         public override async Task OnConnectedAsync()
         {
-            await Clients.Caller.SendAsync("ClientConnected", "¡Bienvenido! Estás conectado al servidor.");
+            _notificationService.SetNotificationChannel(Channel.Email);
+            _ = _notificationService.Notify("Usuario conectandose");
+            await Clients.Caller.SendAsync(
+                "ClientConnected",
+                "¡Bienvenido! Estás conectado al servidor."
+            );
 
             await base.OnConnectedAsync();
         }
 
         public override async Task OnDisconnectedAsync(Exception exception)
-        { 
+        {
             try
             {
-                var (room,deleted) = await _gameHubServices.OnDisconected(Context.ConnectionId);
+                var (room, deleted) = await _gameHubServices.OnDisconected(Context.ConnectionId);
 
                 if (room != null)
                 {
-                var roomDTO = room.GetRoomDTO();
-                if (!deleted)
-                {
-                    await Groups.RemoveFromGroupAsync(Context.ConnectionId, roomDTO.Id);
-                    await _clientHubServices.RemoveUserRoom(Context.ConnectionId,roomDTO);
+                    var roomDTO = room.GetRoomDTO();
+                    if (!deleted)
+                    {
+                        await Groups.RemoveFromGroupAsync(Context.ConnectionId, roomDTO.Id);
+                        await _clientHubServices.RemoveUserRoom(Context.ConnectionId, roomDTO);
 
-                    if(await _gameHubServices.theGameStarts(room))
+                        if (await _gameHubServices.theGameStarts(room))
                         {
                             await StartGame(room);
                         }
-                }
-                else
-                {
+                    }
+                    else
+                    {
                         await _clientHubServices.DeleteRoom(roomDTO.Id);
+                    }
                 }
-                }
-                
-            await base.OnDisconnectedAsync(exception);
+
+                await base.OnDisconnectedAsync(exception);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
             }
-            
         }
 
         public async Task<SocketResponseDTO<UserDTO?>> Login(string userName)
@@ -72,18 +83,18 @@ namespace keyboard_warrior.Hubs
             try
             {
                 UserConnection? user = await _gameHubServices.Login(userName, Context.ConnectionId);
-            if (user == null)
-            {  
-             return response.Send((int)HttpStatusCode.Conflict,ResponseMessages.UserNameExist, null ); 
-            }
-                UserDTO userDTO = new()
+                if (user == null)
                 {
-                    UserName = user.UserName,
-                    Id = user.Id,
-                };
+                    return response.Send(
+                        (int)HttpStatusCode.Conflict,
+                        ResponseMessages.UserNameExist,
+                        null
+                    );
+                }
+                UserDTO userDTO = new() { UserName = user.UserName, Id = user.Id };
 
                 return response.Send((int)HttpStatusCode.OK, ResponseMessages.LoginSucces, userDTO);
-            }     
+            }
             catch (Exception e)
             {
                 _logger.LogError(e, e.Message);
@@ -91,28 +102,36 @@ namespace keyboard_warrior.Hubs
             }
         }
 
-        public async Task<SocketResponseDTO<RoomDTO?>> CreateRoom(string userName, string roomName,string roomTextType)
+        public async Task<SocketResponseDTO<RoomDTO?>> CreateRoom(
+            string userName,
+            string roomName,
+            string roomTextType
+        )
         {
             SocketResponseDTO<RoomDTO?> response = new();
-       
+
             try
             {
-                RoomDTO? roomDTO = await _gameHubServices.CreateRoom(userName,roomName,roomTextType);
-         
+                RoomDTO? roomDTO = await _gameHubServices.CreateRoom(
+                    userName,
+                    roomName,
+                    roomTextType
+                );
+
                 await Groups.AddToGroupAsync(Context.ConnectionId, roomDTO.Id);
                 await _clientHubServices.CreateRoom(roomDTO);
 
-          return response.Send((int)HttpStatusCode.OK, ResponseMessages.RoomCreated, roomDTO);
+                return response.Send((int)HttpStatusCode.OK, ResponseMessages.RoomCreated, roomDTO);
             }
             catch (MyException e)
             {
                 _logger.LogError(e, e.Message);
-                return response.Send(e.ErrorCode, e.Message,null);
+                return response.Send(e.ErrorCode, e.Message, null);
             }
             catch (Exception e)
             {
                 _logger.LogError(e, e.Message);
-                return response.Send((int)HttpStatusCode.InternalServerError, e.Message,null);
+                return response.Send((int)HttpStatusCode.InternalServerError, e.Message, null);
             }
         }
 
@@ -125,14 +144,18 @@ namespace keyboard_warrior.Hubs
                 if (service.Code == (int)HttpStatusCode.OK && service.Data != null)
                 {
                     await Groups.AddToGroupAsync(Context.ConnectionId, service.Data.Id);
-                    await _clientHubServices.JoinRoom(Context.ConnectionId,service.Data);
+                    await _clientHubServices.JoinRoom(Context.ConnectionId, service.Data);
                 }
                 return service;
             }
             catch (Exception e)
             {
                 _logger.LogError(e, e.Message);
-                return new SocketResponseDTO<RoomDTO?>((int)HttpStatusCode.InternalServerError, e.Message,null);
+                return new SocketResponseDTO<RoomDTO?>(
+                    (int)HttpStatusCode.InternalServerError,
+                    e.Message,
+                    null
+                );
             }
         }
 
@@ -140,13 +163,21 @@ namespace keyboard_warrior.Hubs
         {
             try
             {
-            var service = await _gameHubServices.GetRooms();
-            return new SocketResponseDTO<IEnumerable<RoomDTO>?>((int)HttpStatusCode.OK, ResponseMessages.Ok, service);
+                var service = await _gameHubServices.GetRooms();
+                return new SocketResponseDTO<IEnumerable<RoomDTO>?>(
+                    (int)HttpStatusCode.OK,
+                    ResponseMessages.Ok,
+                    service
+                );
             }
             catch (Exception e)
             {
                 _logger.LogError(e, e.Message);
-                return new SocketResponseDTO<IEnumerable<RoomDTO>?>((int)HttpStatusCode.InternalServerError, e.Message, null);
+                return new SocketResponseDTO<IEnumerable<RoomDTO>?>(
+                    (int)HttpStatusCode.InternalServerError,
+                    e.Message,
+                    null
+                );
             }
         }
 
@@ -154,16 +185,22 @@ namespace keyboard_warrior.Hubs
         {
             try
             {
-
-            var service = await _gameHubServices.GetRoom(id);
-            return new SocketResponseDTO<RoomDTO?>((int)HttpStatusCode.OK, ResponseMessages.Ok, service);
+                var service = await _gameHubServices.GetRoom(id);
+                return new SocketResponseDTO<RoomDTO?>(
+                    (int)HttpStatusCode.OK,
+                    ResponseMessages.Ok,
+                    service
+                );
             }
             catch (Exception e)
             {
                 _logger.LogError(e, e.Message);
-                return new SocketResponseDTO<RoomDTO?>((int)HttpStatusCode.InternalServerError, e.Message, null);
+                return new SocketResponseDTO<RoomDTO?>(
+                    (int)HttpStatusCode.InternalServerError,
+                    e.Message,
+                    null
+                );
             }
-
         }
 
         public async Task<SocketResponseDTO<bool>> RemoveUserRoom(string roomId, string userName)
@@ -178,41 +215,48 @@ namespace keyboard_warrior.Hubs
                 if (room == null)
                 {
                     await _clientHubServices.DeleteRoom(roomId);
-                    return  new SocketResponseDTO<bool>((int)HttpStatusCode.OK, ResponseMessages.UserRemoved, true);
+                    return new SocketResponseDTO<bool>(
+                        (int)HttpStatusCode.OK,
+                        ResponseMessages.UserRemoved,
+                        true
+                    );
                 }
 
-                await _clientHubServices.RemoveUserRoom(Context.ConnectionId,room.GetRoomDTO());
+                await _clientHubServices.RemoveUserRoom(Context.ConnectionId, room.GetRoomDTO());
 
                 if (await _gameHubServices.theGameStarts(room))
                 {
                     await StartGame(room);
                 }
 
-                return new SocketResponseDTO<bool>((int)HttpStatusCode.OK, ResponseMessages.UserRemoved, true);
-
+                return new SocketResponseDTO<bool>(
+                    (int)HttpStatusCode.OK,
+                    ResponseMessages.UserRemoved,
+                    true
+                );
             }
-            catch(MyException e)
+            catch (MyException e)
             {
                 _logger.LogError(e, e.Message);
                 return new SocketResponseDTO<bool>(e.ErrorCode, e.Message, false);
-
             }
             catch (Exception e)
             {
                 _logger.LogError(e, e.Message);
-                return new SocketResponseDTO<bool>((int)HttpStatusCode.InternalServerError, e.Message, false);
+                return new SocketResponseDTO<bool>(
+                    (int)HttpStatusCode.InternalServerError,
+                    e.Message,
+                    false
+                );
             }
-
         }
-
 
         public async Task NotReady(string userName, string roomId)
         {
             try
             {
-            await _gameHubServices.NotReady(userName,roomId);
+                await _gameHubServices.NotReady(userName, roomId);
                 await _clientHubServices.ChangeStateUser(roomId, userName, false);
-
             }
             catch (Exception ex)
             {
@@ -225,17 +269,17 @@ namespace keyboard_warrior.Hubs
             try
             {
                 var (room, text) = await _gameHubServices.Ready(userName, roomId);
-                
-            if(text != null)
-            {
+
+                if (text != null)
+                {
                     await StartGame(room);
+                }
+                else
+                {
+                    await _clientHubServices.ChangeStateUser(roomId, userName, true);
+                }
             }
-            else
-            {
-                await _clientHubServices.ChangeStateUser(roomId, userName, true);
-            }
-            }
-            catch(MyException ex)
+            catch (MyException ex)
             {
                 _logger.LogError(ex, ex.Message);
             }
@@ -245,30 +289,28 @@ namespace keyboard_warrior.Hubs
             }
         }
 
-        public async void TextTypedPercentage(int percentage,string userName,string roomId )
+        public async void TextTypedPercentage(int percentage, string userName, string roomId)
         {
             await _clientHubServices.TextTypedPercentage(roomId, userName, percentage);
         }
+
         public async void FinishGame(string userNameAndTimesStamp, string roomId)
         {
             await _clientHubServices.FinishGame(roomId, userNameAndTimesStamp);
         }
- 
-        public async Task RestartRoom(string roomId) 
+
+        public async Task RestartRoom(string roomId)
         {
             try
             {
-
-            Room roomRestarted = await _gameHubServices.RestartRoom(roomId);
+                Room roomRestarted = await _gameHubServices.RestartRoom(roomId);
 
                 await _clientHubServices.RestartRoom(roomId, roomRestarted);
-            }   
-            catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
             }
-            
-
         }
 
         public async Task<SocketResponseDTO<string?>> GetPracticeText(string roomTextType)
@@ -277,12 +319,11 @@ namespace keyboard_warrior.Hubs
 
             try
             {
-            var text = await _gameHubServices.GetPracticeText(roomTextType);
+                var text = await _gameHubServices.GetPracticeText(roomTextType);
 
-            return  response.Send((int)HttpStatusCode.OK, "Text receive", text);
-
+                return response.Send((int)HttpStatusCode.OK, "Text receive", text);
             }
-            catch(MyException ex)
+            catch (MyException ex)
             {
                 _logger.LogError(ex, ex.Message);
                 return response.Send(ex.ErrorCode, ex.Message, null);
@@ -294,14 +335,11 @@ namespace keyboard_warrior.Hubs
             }
         }
 
-
         private async Task StartGame(Room room)
         {
             RoomDTO roomDTO = room.GetRoomDTO();
 
-            IEnumerable<string> usersExcluded = room
-                                               .GetUsers()
-                                               .Select(u => u.ConnectionId);
+            IEnumerable<string> usersExcluded = room.GetUsers().Select(u => u.ConnectionId);
 
             await _clientHubServices.StartPlayTimer(usersExcluded, roomDTO);
 

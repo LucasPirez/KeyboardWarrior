@@ -1,5 +1,7 @@
 using keyboard_warrior.AppManager;
 using keyboard_warrior.Hubs;
+using keyboard_warrior.Notifications;
+using keyboard_warrior.Notifications.Interfaces;
 using keyboard_warrior.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,6 +25,7 @@ builder.Services.AddSingleton<IUsersRepository, UsersRepository>();
 
 builder.Services.AddScoped<IGameServices, GameServices>();
 builder.Services.AddScoped<IClientHubMessagesService, ClientHubServices>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 
 
 var app = builder.Build();
