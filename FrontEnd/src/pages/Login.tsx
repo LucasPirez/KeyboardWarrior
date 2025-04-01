@@ -1,40 +1,38 @@
-import { useEffect, useRef, useState } from 'react';
-import Keyboard from './Keyboard';
-import styles from './index.module.css';
-import { useUser } from '../../hooks/useUser';
-import { navigateTo } from '../../helpers';
-import FakeTyping from './FakeTyping';
-import { TEXT_LOGIN } from '../../constants';
-import spaceClick from '../../assets/spacebar.mp3';
-import click from '../../assets/click.mp3';
-import sound from '../../assets/bocina.png';
-import { Login } from './Login';
+import { useEffect, useRef, useState } from 'react'
+import Keyboard from '../components/login/Keyboard'
+import styles from './login.module.css'
+import { useUser } from '../hooks/useUser'
+import { navigateTo } from '../helpers'
+import FakeTyping from '../components/login/FakeTyping'
+import { TEXT_LOGIN } from '../constants'
+import spaceClick from '../assets/spacebar.mp3'
+import click from '../assets/click.mp3'
+import sound from '../assets/bocina.png'
+import Login from '../components/login/Login'
 
 export default function LoginPage() {
-  const [activeChar, setActiveChar] = useState<
-    Record<string, boolean>
-  >({});
-  const soundRef = useRef<boolean>(false);
-  const { userName } = useUser();
+  const [activeChar, setActiveChar] = useState<Record<string, boolean>>({})
+  const soundRef = useRef<boolean>(false)
+  const { userName } = useUser()
 
   useEffect(() => {
     if (userName)
       navigateTo({
         path: '/rooms',
-      });
+      })
 
     if (soundRef.current) {
-      const newAudio = new Audio();
+      const newAudio = new Audio()
 
       if (activeChar['Space'] !== undefined) {
-        newAudio.src = spaceClick;
-        newAudio.play();
+        newAudio.src = spaceClick
+        newAudio.play()
       } else {
-        newAudio.src = click;
-        newAudio.play();
+        newAudio.src = click
+        newAudio.play()
       }
     }
-  }, [activeChar, userName]);
+  }, [activeChar, userName])
 
   return (
     <section className={styles.container}>
@@ -63,5 +61,5 @@ export default function LoginPage() {
         <Keyboard activeKey={activeChar} />
       </div>
     </section>
-  );
+  )
 }

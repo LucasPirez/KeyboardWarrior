@@ -1,6 +1,6 @@
-import { CreateRoom } from './create-room';
-import Room from './InfoRoom';
-import SelectPractice from './SelectPractice';
+import { CreateRoom } from '../components/create-room'
+import Room from '../components/InfoRoom'
+import SelectPractice from '../components/SelectPractice'
 
 export default function Home() {
   return (
@@ -24,5 +24,5 @@ export default function Home() {
       </div>
       <Room />
     </div>
-  );
+  )
 }
