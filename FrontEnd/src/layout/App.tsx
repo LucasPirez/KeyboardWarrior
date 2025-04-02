@@ -95,7 +95,7 @@ function App() {
       <NotFoundPage />
     ))) ?? (
     <div style={{ position: 'absolute', left: '45%', top: '30%' }}>
-      <ProgressSpinner style={{ width: '100px', height: '100px' }} />
+      <ProgressSpinner style={{ width: '120px', height: '120px' }} />
     </div>
   )
 
@@ -108,8 +108,8 @@ function App() {
               position: 'absolute',
               left: '45%',
               top: '30%',
-              width: '100px',
-              height: '100px',
+              width: '120px',
+              height: '120px',
             }}
           />
         }>
