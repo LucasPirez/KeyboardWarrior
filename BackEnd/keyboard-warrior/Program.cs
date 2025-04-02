@@ -13,11 +13,15 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("CorsPolicy",
-        builder => builder.WithOrigins("https://speedytype-gamma.vercel.app", "http://localhost:5173")
-        .AllowAnyMethod()
-        .AllowAnyHeader()
-        .AllowCredentials());
+    options.AddPolicy(
+        "CorsPolicy",
+        builder =>
+            builder
+                .WithOrigins("https://keyboard-warrior-omega.vercel.app")
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials()
+    );
 });
 
 builder.Services.AddSingleton<IRoomsRepository, RoomsRepository>();
@@ -26,7 +30,6 @@ builder.Services.AddSingleton<IUsersRepository, UsersRepository>();
 builder.Services.AddScoped<IGameServices, GameServices>();
 builder.Services.AddScoped<IClientHubMessagesService, ClientHubServices>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
-
 
 var app = builder.Build();
 
